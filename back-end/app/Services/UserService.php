@@ -10,6 +10,22 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
+    /**
+     * Map frontend sort keys to database columns.
+     */
+    private const SORTABLE_COLUMNS = [
+        'id' => 'id',
+        'name' => 'name',
+        'email' => 'email',
+        'status' => 'status',
+        'lastLoginAt' => 'last_login_at',
+        'createdAt' => 'created_at',
+        'updatedAt' => 'updated_at',
+        'created_at' => 'created_at',
+        'updated_at' => 'updated_at',
+        'last_login_at' => 'last_login_at',
+    ];
+
     public function getPaginatedUsers(
         ?string $search = null,
         ?string $status = null,
@@ -18,16 +34,8 @@ class UserService
         string $sortDirection = 'desc',
         int $perPage = 10
     ): LengthAwarePaginator {
-        $sortColumn = [
-            'name' => 'name',
-            'status' => 'status',
-            'createdAt' => 'created_at',
-            'created_at' => 'created_at',
-            'lastLoginAt' => 'last_login_at',
-            'last_login_at' => 'last_login_at',
-        ][$sortColumn] ?? 'created_at';
-
-        $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+        $resolvedSortColumn = self::SORTABLE_COLUMNS[$sortColumn] ?? 'created_at';
+        $resolvedSortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
 
         return User::query()
             ->with(['roles.permissions'])
@@ -41,7 +49,7 @@ class UserService
             ->when($role && $role !== 'all', function ($q) use ($role) {
                 $q->whereHas('roles', fn ($r) => $r->where('name', $role)->orWhere('id', $role));
             })
-            ->orderBy($sortColumn, $sortDirection)
+            ->orderBy($resolvedSortColumn, $resolvedSortDirection)
             ->paginate($perPage);
     }
 

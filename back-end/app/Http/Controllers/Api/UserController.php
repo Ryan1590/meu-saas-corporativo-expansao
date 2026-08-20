@@ -8,7 +8,6 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\UserService;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -37,10 +36,7 @@ class UserController extends Controller
             perPage: (int) $request->query('perPage', 10)
         );
 
-        $resource = UserResource::collection($users->getCollection());
-        $usersData = $resource instanceof ResourceCollection
-            ? $resource->resolve()
-            : [];
+        $usersData = UserResource::collection($users->items())->resolve();
 
         return response()->json([
             'success' => true,
