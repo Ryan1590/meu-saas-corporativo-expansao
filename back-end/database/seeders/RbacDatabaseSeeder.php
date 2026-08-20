@@ -39,6 +39,7 @@ class RbacDatabaseSeeder extends Seeder
             ['name' => 'api.view', 'label' => 'Visualizar API Tester', 'module' => 'api'],
             ['name' => 'design-system.view', 'label' => 'Visualizar Design System', 'module' => 'design-system'],
             ['name' => 'documentation.view', 'label' => 'Visualizar Documentação', 'module' => 'documentation'],
+            ['name' => 'birthdays.view', 'label' => 'Visualizar Aniversariantes', 'module' => 'birthdays'],
         ];
 
         $createdPermissions = [];

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BirthdayController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
@@ -29,6 +30,7 @@ Route::prefix('v1')->group(function () {
 
         // Dashboard
         Route::get('/dashboard/metrics', [DashboardController::class, 'metrics']);
+        Route::get('/birthdays', [BirthdayController::class, 'index']);
 
         // Gestão de Usuários
         Route::apiResource('users', UserController::class);

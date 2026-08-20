@@ -6,6 +6,7 @@ import { AppLayout } from './layouts/AppLayout';
 import { LoginView } from './views/LoginView';
 import { RegisterView, ForgotPasswordView } from './views/RegisterView';
 import { DashboardView } from './views/DashboardView';
+import { BirthdaysView } from './views/BirthdaysView';
 import { UsersView } from './views/UsersView';
 import { RolesPermissionsView } from './views/RolesPermissionsView';
 import { ScreenPermissionsView } from './views/ScreenPermissionsView';
@@ -76,6 +77,8 @@ const MainRouter: React.FC = () => {
     switch (currentPath) {
       case '/dashboard':
         return <DashboardView onNavigate={navigate} />;
+      case '/birthdays':
+        return <BirthdaysView />;
       case '/users':
       case '/users/create':
       case '/users/edit':

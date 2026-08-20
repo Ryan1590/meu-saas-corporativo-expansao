@@ -22,6 +22,7 @@ import {
   AlertOctagon,
   Search,
   Activity,
+  Cake,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -72,6 +73,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
           icon: <LayoutDashboard className="w-4 h-4" />,
           path: '/dashboard',
           permission: 'dashboard.view',
+        },
+        {
+          id: 'birthdays',
+          label: 'Aniversariantes',
+          icon: <Cake className="w-4 h-4" />,
+          path: '/birthdays',
+          permission: 'birthdays.view',
         },
       ],
     },
@@ -156,6 +164,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
   const getPageTitle = (path: string) => {
     switch (path) {
       case '/dashboard': return 'Dashboard';
+      case '/birthdays': return 'Aniversariantes';
       case '/users': return 'Usuários';
       case '/roles': return 'Perfis & Roles';
       case '/screen-permissions': return 'Acesso por Tela';

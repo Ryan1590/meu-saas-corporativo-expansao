@@ -31,7 +31,7 @@ export const DocumentationView: React.FC = () => {
   };
 
   const setupCommands = `# PASSO A PASSO COMPLETO (WINDOWS / POWERSHELL)
-# Projeto: meu-saas-corporativo
+# Projeto: meu-saas-corporativo - padrão RBAC 
 
 # 0) PRÉ-REQUISITOS
 node -v
