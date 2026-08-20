@@ -10,7 +10,6 @@ import {
   Plus,
   ShieldAlert,
   ArrowRight,
-  Code2,
   Terminal,
   Clock,
   Sparkles,
@@ -122,51 +121,14 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
 
   return (
     <div className="space-y-6 text-left">
-      {/* Welcome Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-2xl p-6 shadow-md">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-300">
-              Ambiente de Produção Ready
-            </span>
-          </div>
-          <h2 className="text-xl font-bold tracking-tight text-white">
-            Olá, {user?.name || 'Administrador'}!
-          </h2>
-          <p className="text-xs text-slate-300 mt-1 max-w-xl">
-            Este é o template base corporativo configurado com Laravel Jetstream, Sanctum API, controle granular de permissões e Design System modular.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 shrink-0">
-          {can('users.create') && (
-            <Button
-              variant="primary"
-              size="sm"
-              leftIcon={<Plus className="w-4 h-4" />}
-              onClick={() => onNavigate('/users')}
-            >
-              Novo Usuário
-            </Button>
-          )}
-          <Button
-            variant="secondary"
-            size="sm"
-            leftIcon={<Code2 className="w-4 h-4" />}
-            onClick={() => onNavigate('/laravel-codebase')}
-          >
-            Ver Código Laravel
-          </Button>
-        </div>
-      </div>
-
+    
       {/* STATS GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-xs">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
               <p className="text-xs font-semibold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
-                Total Users
+                Total de Usuários
               </p>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 {metrics.totalUsers}
@@ -178,7 +140,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
           </div>
           <div className="mt-4 flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
             <TrendingUp className="w-3.5 h-3.5" />
-            <span>+{metrics.usersGrowthPercentage}% vs last month</span>
+            <span>+{metrics.usersGrowthPercentage}% neste mês</span>
           </div>
         </div>
 
@@ -186,7 +148,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
           <div className="flex justify-between items-start">
             <div className="space-y-1">
               <p className="text-xs font-semibold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
-                Active Roles
+                Perfis Ativos
               </p>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 {metrics.totalRoles}
@@ -197,7 +159,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
             </div>
           </div>
           <div className="mt-4 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-slate-400">
-            <span>Fully synchronized (RBAC)</span>
+            <span>Totalmente sincronizados (RBAC)</span>
           </div>
         </div>
 
@@ -205,7 +167,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
           <div className="flex justify-between items-start">
             <div className="space-y-1">
               <p className="text-xs font-semibold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
-                API Health
+                Saúde da API
               </p>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 99.9%
@@ -217,7 +179,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
           </div>
           <div className="mt-4 flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span>Sanctum tokens active</span>
+            <span>Tokens Sanctum ativos</span>
           </div>
         </div>
 
@@ -225,7 +187,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
           <div className="flex justify-between items-start">
             <div className="space-y-1">
               <p className="text-xs font-semibold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
-                Events Today
+                Eventos de Hoje
               </p>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 {metrics.recentActivities.length * 12 + 148}
@@ -236,7 +198,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
             </div>
           </div>
           <div className="mt-4 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-slate-400">
-            <span>Audit trail logging enabled</span>
+            <span>Registro de auditoria ativado</span>
           </div>
         </div>
       </div>
@@ -347,7 +309,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
           <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
             <div>
               <h4 className="font-bold text-sm text-gray-900 dark:text-slate-100">
-                Recent User Activity
+                Atividade recente do usuário
               </h4>
               <p className="text-xs text-gray-400 dark:text-slate-400">
                 Novos membros registrados no sistema
@@ -357,7 +319,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
               onClick={() => onNavigate('/users')}
               className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
             >
-              View Full Report
+             Ver relatório completo
             </button>
           </div>
           <div className="overflow-x-auto">
@@ -418,7 +380,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
         <div className="lg:col-span-4 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-xs flex flex-col overflow-hidden">
           <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
             <h4 className="font-bold text-sm text-gray-900 dark:text-slate-100">
-              System Events
+              Eventos do sistema
             </h4>
             <button
               onClick={() => onNavigate('/logs')}

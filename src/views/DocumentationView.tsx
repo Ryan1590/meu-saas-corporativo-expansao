@@ -30,29 +30,75 @@ export const DocumentationView: React.FC = () => {
     success('Instruções copiadas para a área de transferência!');
   };
 
-  const setupCommands = `# 1. Instalar novo projeto Laravel 11
-composer create-project laravel/laravel meu-saas-enterprise
+  const setupCommands = `# PASSO A PASSO COMPLETO (WINDOWS / POWERSHELL)
+# Projeto: meu-saas-corporativo
 
-# 2. Entrar no diretório
-cd meu-saas-enterprise
+# 0) PRÉ-REQUISITOS
+node -v
+npm -v
+php -v
+composer -V
 
-# 3. Instalar Jetstream com Sanctum
-composer require laravel/jetstream
-php artisan jetstream:install api
+# 1) CLONAR O REPOSITÓRIO
+cd C:\Users\ryan.rodrigues\Documents
+git clone <URL_DO_REPOSITORIO> meu-saas-corporativo
+cd meu-saas-corporativo
 
-# 4. Configurar banco de dados no .env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=saas_enterprise
-DB_USERNAME=root
-DB_PASSWORD=secret
+# 2) BACK-END - INSTALAR DEPENDÊNCIAS PHP
+cd back-end
+composer install
 
-# 5. Executar as Migrations e Seeders do Starter Kit
-php artisan migrate:fresh --seed
+# 3) BACK-END - CRIAR .ENV E CHAVE DA APP
+Copy-Item .env.example .env -Force
+php artisan key:generate
 
-# 6. Iniciar o Servidor de Desenvolvimento
-php artisan serve`;
+# 4) BACK-END - CONFIGURAR BANCO NO .ENV (MYSQL)
+# Edite o arquivo back-end/.env com os dados corretos:
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=meu_saas_corporativo
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# 5) BACK-END - MIGRATIONS + SEEDERS
+php artisan migrate
+php artisan db:seed
+ou melhor php artisan --seed
+
+# 6) BACK-END - STORAGE LINK + LIMPAR CACHE
+php artisan storage:link
+php artisan optimize:clear
+
+# 7) BACK-END - SUBIR API LARAVEL (TERMINAL 1)
+php artisan serve
+# API: http://127.0.0.1:8000
+
+# 8) FRONT-END - INSTALAR DEPENDÊNCIAS NODE (TERMINAL 2)
+cd ..\front-end
+npm install
+
+# 9) FRONT-END - CRIAR .ENV LOCAL (SE NAO EXISTIR)
+# Conteudo do front-end/.env:
+# VITE_BACKEND_URL=http://127.0.0.1:8000
+
+# 10) FRONT-END - SUBIR APP
+npm run dev
+# Front: http://127.0.0.1:5173
+
+# 11) FLUXO FINAL DE USO
+# - Abra http://127.0.0.1:5173
+# - O front usa proxy /api para o Laravel em 8000
+
+# 12) COMANDOS DE VALIDACAO (OPCIONAL)
+# Back-end:
+cd ..\back-end
+php artisan route:list --path=api/v1
+
+# Front-end:
+cd ..\front-end
+npm run lint
+npm run build`;
 
   return (
     <div className="space-y-6 text-left">
@@ -126,7 +172,7 @@ php artisan serve`;
       {activeTab === 'setup' && (
         <div className="space-y-6">
           <Card
-            title="Comandos para Inicializar o Backend Laravel"
+            title="Comandos Completos Pos-Clone (Back-end + Front-end)"
             action={
               <Button
                 variant="secondary"

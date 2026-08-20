@@ -311,26 +311,35 @@ export const UsersView: React.FC = () => {
     }
   };
 
-  // Export CSV
-  const handleExportCSV = () => {
-    const headers = ['ID', 'Nome', 'Email', 'Status', 'Perfis', 'CriadoEm'];
+  const handleExportXLS = () => {
+    const escapeHtml = (value: unknown) => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    const headers = ['ID', 'Nome', 'Email', 'Status', 'Perfis', 'Criado em'];
     const rows = users.map((u) => [
       u.id,
-      `"${u.name}"`,
-      `"${u.email}"`,
+      u.name,
+      u.email,
       u.status,
-      `"${u.rolesDetails?.map((r) => r.label).join(', ') || u.roles.join(', ')}"`,
+      u.rolesDetails?.map((r) => r.label).join(', ') || u.roles.join(', '),
       u.createdAt,
     ]);
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const table = `<table><thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join('')}</tr></thead><tbody>${rows
+      .map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`)
+      .join('')}</tbody></table>`;
+    const content = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${table}</body></html>`;
+    const blob = new Blob([content], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    const encodedUri = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `usuarios_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `usuarios_export_${new Date().toISOString().slice(0, 10)}.xls`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    success('Exportação CSV concluída com sucesso!');
+    URL.revokeObjectURL(encodedUri);
+    success('Usuários exportados em Excel com sucesso!');
   };
 
   // Screen-level permission shield
@@ -497,9 +506,9 @@ export const UsersView: React.FC = () => {
             variant="secondary"
             size="sm"
             leftIcon={<Download className="w-3.5 h-3.5" />}
-            onClick={handleExportCSV}
+            onClick={handleExportXLS}
           >
-            Exportar CSV
+            Exportar XLS
           </Button>
 
           {can('users.create') && (

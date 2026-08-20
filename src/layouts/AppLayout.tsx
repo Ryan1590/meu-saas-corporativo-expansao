@@ -6,11 +6,9 @@ import {
   FileText,
   Sliders,
   History,
-  Code2,
   Palette,
   BookOpen,
   LogOut,
-  ChevronDown,
   ChevronRight,
   Menu,
   X,
@@ -20,11 +18,9 @@ import {
   Layers,
   Terminal,
   KeyRound,
-  UserCheck,
   MonitorCheck,
   AlertOctagon,
   Search,
-  Bell,
   Activity,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -40,6 +36,7 @@ export interface NavItem {
   icon: React.ReactNode;
   path: string;
   permission?: string;
+  adminOnly?: boolean;
   badge?: React.ReactNode;
   children?: {
     id: string;
@@ -57,7 +54,7 @@ interface AppLayoutProps {
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, children }) => {
-  const { user, logout, can, switchDemoUser } = useAuth();
+  const { user, logout, can, hasRole } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -129,37 +126,26 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
           label: 'API Tester (Sanctum)',
           icon: <Terminal className="w-4 h-4" />,
           path: '/api-playground',
+          permission: 'api.view',
           badge: <Badge variant="indigo" size="sm">REST</Badge>,
         },
-        {
-          id: 'laravel-codebase',
-          label: 'Código Laravel 11',
-          icon: <Code2 className="w-4 h-4" />,
-          path: '/laravel-codebase',
-          badge: <Badge variant="success" size="sm">PHP</Badge>,
-        },
+        
         {
           id: 'design-system',
           label: 'Design System',
           icon: <Palette className="w-4 h-4" />,
           path: '/design-system',
+          permission: 'design-system.view',
         },
         {
           id: 'documentation',
           label: 'Documentação / Guia',
           icon: <BookOpen className="w-4 h-4" />,
           path: '/documentation',
+          permission: 'documentation.view',
         },
       ],
     },
-  ];
-
-  // Quick Demo user profiles for testing authorization live
-  const demoUsers = [
-    { id: 'usr-1', label: 'Carlos Eduardo (Admin Geral)', role: 'admin', badge: 'Admin - Acesso Total' },
-    { id: 'usr-2', label: 'Mariana Rios (Gerente)', role: 'manager', badge: 'Gerente - Sem Settings' },
-    { id: 'usr-3', label: 'Lucas Silva (Operador)', role: 'operator', badge: 'Operador - Sem Criar/Logs' },
-    { id: 'usr-4', label: 'Beatriz Lima (Auditor)', role: 'auditor', badge: 'Auditor - Somente Leitura' },
   ];
 
   const handleNavClick = (path: string) => {
@@ -176,7 +162,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
       case '/logs': return 'Logs de Auditoria';
       case '/settings': return 'Configurações do Sistema';
       case '/api-playground': return 'API Playground';
-      case '/laravel-codebase': return 'Código Laravel 11';
       case '/design-system': return 'Design System';
       case '/documentation': return 'Documentação Técnica';
       default: return 'Portal';
@@ -202,13 +187,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
         {/* Brand Header */}
         <div className="flex h-16 items-center justify-between px-5 border-b border-slate-800">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20 shrink-0">
-              E
-            </div>
+            
             {(isSidebarOpen || isMobileMenuOpen) && (
               <div className="flex flex-col text-left">
                 <span className="font-bold text-base text-white tracking-tight leading-tight">
-                  EnterpriseOS
+                  Meu SaaS Corporativo
                 </span>
                 <span className="text-[10px] text-slate-400 font-medium">
                   Laravel 11 + React Base
@@ -229,7 +212,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
           {navigationGroups.map((group, gIdx) => {
             const visibleItems = group.items.filter(
-              (item) => !item.permission || can(item.permission)
+              (item) => (!item.permission || can(item.permission)) && (!item.adminOnly || hasRole('admin'))
             );
 
             if (visibleItems.length === 0) return null;
@@ -347,47 +330,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
           </div>
 
           <div className="flex items-center gap-3 sm:gap-4">
-            {/* Search Input Bar */}
-            <div className="relative hidden md:block">
-              <input
-                type="text"
-                placeholder="Pesquisar..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-1.5 bg-gray-100 dark:bg-slate-800 border-none rounded-lg text-xs w-48 lg:w-64 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400"
-              />
-              <Search className="w-4 h-4 absolute left-3 top-2 text-gray-400" />
-            </div>
-
-            {/* Quick RBAC Switcher dropdown */}
-            <Dropdown
-              trigger={
-                <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 px-2.5 py-1.5 text-xs font-medium text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-750 transition-colors cursor-pointer">
-                  <UserCheck className="w-3.5 h-3.5 text-indigo-500" />
-                  <span className="hidden sm:inline">{user?.name || 'Admin'}</span>
-                  <ChevronDown className="w-3 h-3 text-gray-400" />
-                </button>
-              }
-              items={demoUsers.map((du) => ({
-                key: du.id,
-                label: (
-                  <div className="py-0.5">
-                    <div className="font-semibold text-slate-800 dark:text-slate-200">
-                      {du.label}
-                    </div>
-                    <div className="text-[11px] text-slate-400">{du.badge}</div>
-                  </div>
-                ),
-                onClick: () => switchDemoUser(du.id),
-              }))}
-            />
-
-            {/* Notification Bell */}
-            <button className="relative p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-            </button>
-
+           
             {/* Dark / Light Mode Toggle */}
             <button
               onClick={toggleTheme}
@@ -428,12 +371,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
                   label: 'Configurações de Segurança',
                   icon: <Sliders className="w-3.5 h-3.5" />,
                   onClick: () => onNavigate('/settings'),
-                },
-                {
-                  key: 'code',
-                  label: 'Arquivos Laravel 11',
-                  icon: <Code2 className="w-3.5 h-3.5" />,
-                  onClick: () => onNavigate('/laravel-codebase'),
                 },
                 {
                   key: 'docs',

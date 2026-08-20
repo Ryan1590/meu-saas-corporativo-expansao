@@ -28,10 +28,9 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   '/reports': 'reports.view',
   '/logs': 'logs.view',
   '/settings': 'settings.view',
-  '/api-playground': 'dashboard.view',
-  '/laravel-codebase': 'dashboard.view',
-  '/design-system': 'dashboard.view',
-  '/documentation': 'dashboard.view',
+  '/api-playground': 'api.view',
+  '/design-system': 'design-system.view',
+  '/documentation': 'documentation.view',
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

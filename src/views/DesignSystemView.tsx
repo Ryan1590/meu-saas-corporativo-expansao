@@ -138,7 +138,7 @@ export const DesignSystemView: React.FC = () => {
                 label="Campo de Texto Padrão"
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
-                hint="Texto de apoio para orientar o usuário"
+                helperText="Texto de apoio para orientar o usuário"
               />
 
               <Input

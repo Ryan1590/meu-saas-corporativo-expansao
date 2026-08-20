@@ -12,7 +12,6 @@ import { ScreenPermissionsView } from './views/ScreenPermissionsView';
 import { AuditLogsView } from './views/AuditLogsView';
 import { SettingsView } from './views/SettingsView';
 import { ApiPlaygroundView } from './views/ApiPlaygroundView';
-import { LaravelCodeViewer } from './views/LaravelCodeViewer';
 import { DesignSystemView } from './views/DesignSystemView';
 import { DocumentationView } from './views/DocumentationView';
 import { ForbiddenShield } from './views/ForbiddenView';
@@ -92,8 +91,6 @@ const MainRouter: React.FC = () => {
         return <SettingsView />;
       case '/api-playground':
         return <ApiPlaygroundView />;
-      case '/laravel-codebase':
-        return <LaravelCodeViewer />;
       case '/design-system':
         return <DesignSystemView />;
       case '/documentation':

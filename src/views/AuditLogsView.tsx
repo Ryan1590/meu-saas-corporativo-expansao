@@ -77,28 +77,36 @@ export const AuditLogsView: React.FC = () => {
     );
   }
 
-  const handleExportCSV = () => {
+  const handleExportXLS = () => {
+    const escapeHtml = (value: unknown) => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
     const headers = ['ID', 'Usuário', 'Ação', 'Módulo', 'Descrição', 'IP', 'Data'];
     const rows = logs.map((l) => [
       l.id,
-      `"${l.userName}"`,
+      l.userName,
       l.action,
       l.module,
-      `"${l.description}"`,
+      l.description,
       l.ipAddress,
       l.createdAt,
     ]);
-    const csvContent =
-      'data:text/csv;charset=utf-8,' +
-      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const table = `<table><thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join('')}</tr></thead><tbody>${rows
+      .map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`)
+      .join('')}</tbody></table>`;
+    const content = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${table}</body></html>`;
+    const blob = new Blob([content], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    const encodedUri = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `audit_logs_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `audit_logs_${new Date().toISOString().slice(0, 10)}.xls`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    success('Logs exportados com sucesso!');
+    URL.revokeObjectURL(encodedUri);
+    success('Logs exportados em Excel com sucesso!');
   };
 
   const columns: Column<AuditLog>[] = [
@@ -207,7 +215,7 @@ export const AuditLogsView: React.FC = () => {
           variant="secondary"
           size="sm"
           leftIcon={<Download className="w-3.5 h-3.5" />}
-          onClick={handleExportCSV}
+          onClick={handleExportXLS}
         >
           Exportar Logs
         </Button>

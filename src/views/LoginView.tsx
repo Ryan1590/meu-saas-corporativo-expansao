@@ -15,7 +15,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onNavigate }) => {
   const { success, error: toastError } = useToast();
 
   const [email, setEmail] = useState('admin@empresa.com');
-  const [password, setPassword] = useState('Admin@2026!');
+  const [password, setPassword] = useState('Admin@2026!Secure');
   const [remember, setRemember] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -54,7 +54,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onNavigate }) => {
 
   const fillQuickCredentials = (demoEmail: string) => {
     setEmail(demoEmail);
-    setPassword('Admin@2026!');
+    setPassword('Admin@2026!Secure');
   };
 
   return (
