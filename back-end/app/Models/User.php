@@ -26,6 +26,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'data_nascimento',
         'avatar',
         'password',
         'status',
@@ -48,6 +49,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'data_nascimento' => 'date',
             'last_login_at' => 'datetime',
             'password' => 'hashed',
         ];

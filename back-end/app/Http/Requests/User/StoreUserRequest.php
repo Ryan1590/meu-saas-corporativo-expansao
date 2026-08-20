@@ -17,6 +17,7 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'min:3', 'max:255'],
             'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users,email'],
+            'data_nascimento' => ['nullable', 'date'],
             'avatar' => ['nullable', 'string'],
             'password' => ['required', 'string', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
             'status' => ['nullable', 'string', 'in:active,inactive,suspended'],

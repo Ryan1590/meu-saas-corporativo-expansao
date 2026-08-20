@@ -103,6 +103,7 @@ class RbacDatabaseSeeder extends Seeder
                 'name' => 'Administrador do Sistema',
                 'password' => Hash::make(env('INITIAL_ADMIN_PASSWORD', 'Admin@2026!Secure')),
                 'email_verified_at' => now(),
+                'data_nascimento' => '1990-01-01',
                 'status' => 'active',
             ]
         );

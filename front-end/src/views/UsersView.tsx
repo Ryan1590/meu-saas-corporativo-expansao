@@ -63,6 +63,7 @@ export const UsersView: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    data_nascimento: '',
     password: '',
     avatar: '',
     status: 'active' as UserStatus,
@@ -138,6 +139,7 @@ export const UsersView: React.FC = () => {
     setFormData({
       name: '',
       email: '',
+      data_nascimento: '',
       password: '',
       avatar: '',
       status: 'active',
@@ -153,10 +155,11 @@ export const UsersView: React.FC = () => {
     setFormData({
       name: user.name,
       email: user.email,
+      data_nascimento: user.data_nascimento || '',
       password: '',
       avatar: user.avatar || '',
       status: user.status,
-      roles: user.roles || [],
+      roles: user.roleIds || user.rolesDetails?.map((role) => role.id) || [],
     });
     setFormErrors({});
     setIsEditModalOpen(true);
@@ -317,11 +320,12 @@ export const UsersView: React.FC = () => {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
-    const headers = ['ID', 'Nome', 'Email', 'Status', 'Perfis', 'Criado em'];
+    const headers = ['ID', 'Nome', 'Email', 'Data de Nascimento', 'Status', 'Perfis', 'Criado em'];
     const rows = users.map((u) => [
       u.id,
       u.name,
       u.email,
+      u.data_nascimento || '',
       u.status,
       u.rolesDetails?.map((r) => r.label).join(', ') || u.roles.join(', '),
       u.createdAt,
@@ -645,6 +649,14 @@ export const UsersView: React.FC = () => {
           />
 
           <Input
+            label="Data de Nascimento"
+            type="date"
+            value={formData.data_nascimento}
+            onChange={(e) => setFormData({ ...formData, data_nascimento: e.target.value })}
+            error={formErrors.data_nascimento}
+          />
+
+          <Input
             label="Senha Inicial"
             type="password"
             placeholder="Mínimo 8 caracteres (letras e números)"
@@ -734,6 +746,14 @@ export const UsersView: React.FC = () => {
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             error={formErrors.email}
             required
+          />
+
+          <Input
+            label="Data de Nascimento"
+            type="date"
+            value={formData.data_nascimento}
+            onChange={(e) => setFormData({ ...formData, data_nascimento: e.target.value })}
+            error={formErrors.data_nascimento}
           />
 
           <div className="space-y-1.5">

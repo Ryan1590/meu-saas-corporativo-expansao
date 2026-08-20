@@ -17,6 +17,7 @@ class UserService
         'id' => 'id',
         'name' => 'name',
         'email' => 'email',
+        'dataNascimento' => 'data_nascimento',
         'status' => 'status',
         'lastLoginAt' => 'last_login_at',
         'createdAt' => 'created_at',
@@ -59,6 +60,7 @@ class UserService
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'data_nascimento' => $data['data_nascimento'] ?? null,
                 'avatar' => $data['avatar'] ?? null,
                 'password' => Hash::make($data['password']),
                 'status' => $data['status'] ?? 'active',
@@ -88,6 +90,7 @@ class UserService
             $updateFields = [
                 'name' => $data['name'] ?? $user->name,
                 'email' => $data['email'] ?? $user->email,
+                'data_nascimento' => $data['data_nascimento'] ?? $user->data_nascimento,
                 'avatar' => $data['avatar'] ?? $user->avatar,
                 'status' => $data['status'] ?? $user->status,
             ];

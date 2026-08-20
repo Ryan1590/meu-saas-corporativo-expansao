@@ -24,9 +24,11 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  data_nascimento?: string | null;
   status: UserStatus;
   avatar?: string;
   roles: string[]; // array of role IDs or names
+  roleIds?: string[];
   rolesDetails?: Role[];
   permissions?: string[]; // aggregated permissions
   lastLoginAt: string | null;

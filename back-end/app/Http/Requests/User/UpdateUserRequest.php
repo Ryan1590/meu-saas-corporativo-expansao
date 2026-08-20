@@ -28,6 +28,7 @@ class UpdateUserRequest extends FormRequest
                 'max:255',
                 Rule::unique('users', 'email')->ignore($userId),
             ],
+            'data_nascimento' => ['sometimes', 'nullable', 'date'],
             'avatar' => ['nullable', 'string'],
             'password' => ['nullable', 'string', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
             'status' => ['sometimes', 'string', 'in:active,inactive,suspended'],
