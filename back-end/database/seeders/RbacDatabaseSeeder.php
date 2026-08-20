@@ -84,7 +84,7 @@ class RbacDatabaseSeeder extends Seeder
         $operatorRole = Role::updateOrCreate(
             ['name' => 'operator'],
             [
-                'label' => 'Operador',
+                'label' => 'Analista',
                 'description' => 'Acesso operacional a dashboards e relatórios básicos.',
                 'is_system' => false,
             ]
