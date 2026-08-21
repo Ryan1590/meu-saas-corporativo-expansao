@@ -1,7 +1,7 @@
 import React from 'react';
-import { Shield, CheckCircle2, Lock, Sparkles, Key } from 'lucide-react';
+import { Building2, CheckCircle2, Lock, ClipboardList, Moon, Shield, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon } from 'lucide-react';
+import logoGazin from '../assets/logo-gazin.png';
 
 interface GuestLayoutProps {
   children: React.ReactNode;
@@ -11,77 +11,127 @@ interface GuestLayoutProps {
 
 export const GuestLayout: React.FC<GuestLayoutProps> = ({ children, title, subtitle }) => {
   const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
 
   return (
-    <div className="min-h-screen flex flex-col justify-center bg-slate-900 text-slate-100 relative overflow-hidden font-sans">
-      {/* Background Subtle Gradient Mesh */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-950/40 via-slate-900 to-slate-950" />
-      <div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div
+      className={
+        isDark
+          ? 'min-h-screen flex flex-col justify-center bg-slate-950 text-slate-100 relative overflow-hidden font-sans'
+          : 'min-h-screen flex flex-col justify-center bg-slate-100 text-slate-900 relative overflow-hidden font-sans'
+      }
+    >
+      <div
+        className={
+          theme === 'dark'
+            ? 'absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-500/10 via-slate-900 to-slate-950'
+            : 'absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100 via-slate-50 to-white'
+        }
+      />
+      <div className="absolute -top-28 -right-20 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-28 -left-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Theme Toggle Top Right */}
       <div className="absolute top-6 right-6 z-20">
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
+          className={
+            theme === 'dark'
+              ? 'p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer'
+              : 'p-2 rounded-xl bg-white/90 border border-slate-200 text-slate-700 hover:text-slate-900 shadow-sm transition-colors cursor-pointer'
+          }
+          aria-label="Alternar tema"
         >
           {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
         </button>
       </div>
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-4 py-8 grid lg:grid-cols-12 gap-8 items-center">
-        {/* Left Branding / Value Proposition Hero Column */}
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 py-10 grid lg:grid-cols-12 gap-8 items-center">
         <div className="hidden lg:flex lg:col-span-6 flex-col text-left space-y-6 pr-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
-              <Shield className="h-6 w-6" />
-            </div>
-            <div>
-              <span className="text-xl font-bold tracking-tight text-white">
-                CoreBase<span className="text-indigo-400">.io</span>
-              </span>
-              <span className="block text-xs text-indigo-200/80 font-medium">
-                Enterprise SaaS Starter Kit
-              </span>
+          <div className="flex items-center justify-start">
+            <div
+              className={
+                isDark
+                  ? 'flex h-28 w-[min(100%,34rem)] items-center justify-center overflow-hidden rounded-[1.9rem] border border-blue-500/30 bg-slate-900/70 p-3 shadow-[0_20px_60px_rgba(59,130,246,0.22)]'
+                  : 'flex h-28 w-[min(100%,34rem)] items-center justify-center overflow-hidden rounded-[1.9rem] border border-blue-200 bg-white/95 p-3 shadow-[0_20px_60px_rgba(37,99,235,0.12)]'
+              }
+            >
+              <img
+                src={logoGazin}
+                alt="Logo Gazin Expansão"
+                className="h-full w-full object-contain drop-shadow-[0_12px_24px_rgba(37,99,235,0.18)]"
+              />
             </div>
           </div>
 
-          <div className="space-y-3">
-            <h1 className="text-3xl font-extrabold tracking-tight text-white leading-tight">
-              Base corporativa pronta para escalar seus projetos.
+          <div className="space-y-4">
+            <div
+              className={
+                theme === 'dark'
+                  ? 'inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200'
+                  : 'inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-700'
+              }
+            >
+              <Shield className="w-3.5 h-3.5" />
+              Sistema de gestão de filiais
+            </div>
+
+            <h1 className={theme === 'dark' ? 'text-4xl font-black tracking-tight text-white leading-tight max-w-xl' : 'text-4xl font-black tracking-tight text-slate-900 leading-tight max-w-xl'}>
+              Operação inteligente para o crescimento da sua rede.
             </h1>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              Estrutura profissional com Laravel 11 Jetstream + Sanctum API, RBAC granular com controle de acesso por tela, trilha de auditoria e Design System completo em React & TypeScript.
+
+            <p className={theme === 'dark' ? 'text-sm text-slate-300 leading-relaxed max-w-lg' : 'text-sm text-slate-600 leading-relaxed max-w-lg'}>
+              Centralize processos, acompanhe desempenho, controle filiais e tome decisões com mais agilidade em uma plataforma pensada para expansão empresarial.
             </p>
           </div>
 
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Autenticação Jetstream com sessões seguras e tokens Sanctum</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Roles & Permissions modulares e validação no backend + frontend</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-slate-300">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Código pronto com Migrations, Seeders, FormRequests e Policies</span>
-            </div>
+          <div className="grid grid-cols-3 gap-3 max-w-xl">
+            {[
+              { icon: Building2, label: 'Filiais' },
+              { icon: ClipboardList, label: 'Documentos' },
+              { icon: Lock, label: 'Segurança' },
+            ].map(({ icon: Icon, label }) => (
+              <div
+                key={label}
+                className={
+                  theme === 'dark'
+                    ? 'rounded-2xl border border-slate-800 bg-slate-900/70 px-3 py-3 shadow-lg shadow-slate-950/30'
+                    : 'rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm shadow-slate-200/60'
+                }
+              >
+                <Icon className={theme === 'dark' ? 'w-4 h-4 text-amber-300 mb-2' : 'w-4 h-4 text-blue-600 mb-2'} />
+                <span className={theme === 'dark' ? 'text-[11px] font-medium text-slate-200' : 'text-[11px] font-medium text-slate-700'}>{label}</span>
+              </div>
+            ))}
           </div>
 
-          <div className="pt-4 border-t border-slate-800/80 flex items-center gap-3 text-xs text-slate-400">
-            <Lock className="w-4 h-4 text-indigo-400" />
-            <span>Camada de proteção contra CSRF, XSS, Mass Assignment e Brute Force</span>
+          <div className={theme === 'dark' ? 'pt-4 border-t border-slate-800/80 flex items-start gap-3 text-sm text-slate-300 max-w-lg' : 'pt-4 border-t border-slate-200 flex items-start gap-3 text-sm text-slate-600 max-w-lg'}>
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+            <span>Estrutura preparada para gestão financeira, operacional e de processos com visual moderno e confiável.</span>
           </div>
         </div>
 
-        {/* Right Form Card */}
         <div className="lg:col-span-6 w-full max-w-md mx-auto">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 shadow-2xl p-6 sm:p-8 backdrop-blur-md">
+          <div
+            className={
+              theme === 'dark'
+                ? 'rounded-3xl border border-slate-800 bg-slate-900/90 shadow-[0_25px_80px_rgba(15,23,42,0.75)] p-6 sm:p-8 backdrop-blur-md'
+                : 'rounded-3xl border border-slate-200 bg-white/95 shadow-[0_25px_60px_rgba(15,23,42,0.08)] p-6 sm:p-8 backdrop-blur-md'
+            }
+          >
             <div className="mb-6 text-left">
-              <h2 className="text-xl font-bold text-white tracking-tight">{title}</h2>
-              <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
+              <div
+                className={
+                  theme === 'dark'
+                    ? 'inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-1 text-[10px] uppercase tracking-[0.24em] text-slate-300'
+                    : 'inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] uppercase tracking-[0.24em] text-emerald-700'
+                }
+              >
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                Acesso seguro
+              </div>
+
+              <h2 className={theme === 'dark' ? 'mt-4 text-2xl font-bold text-white tracking-tight' : 'mt-4 text-2xl font-bold text-slate-900 tracking-tight'}>{title}</h2>
+              <p className={theme === 'dark' ? 'text-xs text-slate-400 mt-1' : 'text-xs text-slate-500 mt-1'}>{subtitle}</p>
             </div>
 
             {children}

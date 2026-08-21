@@ -52,11 +52,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onNavigate }) => {
     }
   };
 
-  const fillQuickCredentials = (demoEmail: string) => {
-    setEmail(demoEmail);
-    setPassword('Admin@2026!Secure');
-  };
-
   return (
     <GuestLayout
       title="Acesse sua conta"
@@ -119,59 +114,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onNavigate }) => {
           Entrar no Sistema
         </Button>
 
-        {/* Quick Demo Credentials Selector */}
-        <div className="mt-6 pt-5 border-t border-slate-800 space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 text-left">
-            Credenciais Rápidas para Teste:
-          </p>
-          <div className="grid grid-cols-2 gap-2 text-left">
-            <button
-              type="button"
-              onClick={() => fillQuickCredentials('admin@empresa.com')}
-              className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-[11px] text-slate-300 hover:text-white transition-colors cursor-pointer"
-            >
-              <span className="font-semibold block text-indigo-400">Admin Geral</span>
-              <span>admin@empresa.com</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => fillQuickCredentials('gerente@empresa.com')}
-              className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-[11px] text-slate-300 hover:text-white transition-colors cursor-pointer"
-            >
-              <span className="font-semibold block text-emerald-400">Gerente</span>
-              <span>gerente@empresa.com</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => fillQuickCredentials('operador@empresa.com')}
-              className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-[11px] text-slate-300 hover:text-white transition-colors cursor-pointer"
-            >
-              <span className="font-semibold block text-amber-400">Operador</span>
-              <span>operador@empresa.com</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => fillQuickCredentials('auditor@empresa.com')}
-              className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-[11px] text-slate-300 hover:text-white transition-colors cursor-pointer"
-            >
-              <span className="font-semibold block text-purple-400">Auditor</span>
-              <span>auditor@empresa.com</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="text-center pt-2">
-          <p className="text-xs text-slate-400">
-            Ainda não tem conta?{' '}
-            <button
-              type="button"
-              onClick={() => onNavigate('/register')}
-              className="text-indigo-400 font-semibold hover:text-indigo-300 cursor-pointer"
-            >
-              Criar conta
-            </button>
-          </p>
-        </div>
       </form>
     </GuestLayout>
   );
