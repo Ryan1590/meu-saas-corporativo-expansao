@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use RuntimeException;
 
 class UserController extends Controller
 {
@@ -57,15 +58,24 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
 
-        $user = $this->userService->createUser(
-            data: $request->validated(),
-            creator: $request->user()
-        );
+        try {
+            $user = $this->userService->createUser(
+                data: $request->validated(),
+                creator: $request->user()
+            );
+        } catch (RuntimeException $exception) {
+            report($exception);
+
+            return response()->json([
+                'success' => false,
+                'message' => __('Não foi possível enviar o convite de definição de senha. Tente novamente.'),
+            ], 503);
+        }
 
         return (new UserResource($user))
             ->additional([
                 'success' => true,
-                'message' => __('Usuário criado com sucesso.'),
+                'message' => __('Usuário criado. Enviamos um link para definição de senha por e-mail.'),
             ])
             ->response()
             ->setStatusCode(201);
@@ -124,25 +134,22 @@ class UserController extends Controller
     }
 
     /**
-     * Reset user password.
+    * Send a password reset link to the user.
      */
     public function resetPassword(Request $request, User $user): JsonResponse
     {
         $this->authorize('update', $user);
 
-        $validated = $request->validate([
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
-        $this->userService->updateUser(
-            user: $user,
-            data: ['password' => $validated['password']],
-            updater: $request->user()
-        );
+        if (!$this->userService->sendPasswordResetLink($user)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Não foi possível enviar o link de redefinição. Tente novamente.'),
+            ], 503);
+        }
 
         return response()->json([
             'success' => true,
-            'message' => __('Senha do usuário atualizada com sucesso.'),
+            'message' => __('Link de redefinição de senha enviado com sucesso.'),
             'data' => null,
         ]);
     }

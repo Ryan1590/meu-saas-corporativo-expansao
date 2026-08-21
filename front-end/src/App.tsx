@@ -4,7 +4,7 @@ import { ToastProvider } from './context/ToastContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppLayout } from './layouts/AppLayout';
 import { LoginView } from './views/LoginView';
-import { RegisterView, ForgotPasswordView } from './views/RegisterView';
+import { RegisterView, ForgotPasswordView, ResetPasswordView } from './views/RegisterView';
 import { DashboardView } from './views/DashboardView';
 import { BirthdaysView } from './views/BirthdaysView';
 import { UsersView } from './views/UsersView';
@@ -48,14 +48,19 @@ const MainRouter: React.FC = () => {
     );
   }
 
-  // Unauthenticated Guest Routes
+  // Public guest routes must always be reachable, even with an active session.
+  if (currentPath === '/register') {
+    return <RegisterView onNavigate={navigate} />;
+  }
+  if (currentPath === '/forgot-password') {
+    return <ForgotPasswordView onNavigate={navigate} />;
+  }
+  if (currentPath === '/reset-password') {
+    return <ResetPasswordView onNavigate={navigate} />;
+  }
+
+  // Unauthenticated users are redirected to login for every other route.
   if (!user) {
-    if (currentPath === '/register') {
-      return <RegisterView onNavigate={navigate} />;
-    }
-    if (currentPath === '/forgot-password') {
-      return <ForgotPasswordView onNavigate={navigate} />;
-    }
     return <LoginView onNavigate={navigate} />;
   }
 

@@ -3,7 +3,6 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
 class StoreUserRequest extends FormRequest
 {
@@ -19,7 +18,6 @@ class StoreUserRequest extends FormRequest
             'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users,email'],
             'data_nascimento' => ['nullable', 'date'],
             'avatar' => ['nullable', 'string'],
-            'password' => ['required', 'string', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
             'status' => ['nullable', 'string', 'in:active,inactive,suspended'],
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => ['required', 'string', 'exists:roles,id'],
@@ -33,7 +31,6 @@ class StoreUserRequest extends FormRequest
             'name.min' => 'O nome deve ter no mínimo 3 caracteres.',
             'email.required' => 'O endereço de e-mail é obrigatório.',
             'email.unique' => 'Este e-mail já está cadastrado no sistema.',
-            'password.required' => 'A senha de acesso é obrigatória.',
             'roles.required' => 'Selecione pelo menos um perfil para o usuário.',
             'roles.min' => 'Selecione pelo menos um perfil de acesso.',
         ];

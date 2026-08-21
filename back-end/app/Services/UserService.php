@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 class UserService
 {
@@ -62,7 +65,7 @@ class UserService
                 'email' => $data['email'],
                 'data_nascimento' => $data['data_nascimento'] ?? null,
                 'avatar' => $data['avatar'] ?? null,
-                'password' => Hash::make($data['password']),
+                'password' => Hash::make(Str::password(40)),
                 'status' => $data['status'] ?? 'active',
             ]);
 
@@ -80,8 +83,17 @@ class UserService
                 'details' => ['user_id' => $user->id, 'roles' => $data['roles'] ?? []],
             ]);
 
+            if (!$this->sendPasswordResetLink($user)) {
+                throw new RuntimeException('Não foi possível enviar o convite de definição de senha.');
+            }
+
             return $user->load('roles.permissions');
         });
+    }
+
+    public function sendPasswordResetLink(User $user): bool
+    {
+        return Password::sendResetLink(['email' => $user->email]) === Password::RESET_LINK_SENT;
     }
 
     public function updateUser(User $user, array $data, ?User $updater = null): User

@@ -64,7 +64,6 @@ export const UsersView: React.FC = () => {
     name: '',
     email: '',
     data_nascimento: '',
-    password: '',
     avatar: '',
     status: 'active' as UserStatus,
     roles: [] as string[],
@@ -140,7 +139,6 @@ export const UsersView: React.FC = () => {
       name: '',
       email: '',
       data_nascimento: '',
-      password: '',
       avatar: '',
       status: 'active',
       roles: roles.length > 0 ? [roles[0].id] : ['role-operator'],
@@ -156,7 +154,6 @@ export const UsersView: React.FC = () => {
       name: user.name,
       email: user.email,
       data_nascimento: user.data_nascimento || '',
-      password: '',
       avatar: user.avatar || '',
       status: user.status,
       roles: user.roleIds || user.rolesDetails?.map((role) => role.id) || [],
@@ -202,7 +199,7 @@ export const UsersView: React.FC = () => {
         return;
       }
 
-      success(`Usuário "${formData.name}" cadastrado com sucesso!`);
+      success(json.message || `Convite enviado para "${formData.name}" com sucesso!`);
       setIsAddModalOpen(false);
       fetchUsers();
     } catch (err) {
@@ -654,16 +651,6 @@ export const UsersView: React.FC = () => {
             value={formData.data_nascimento}
             onChange={(e) => setFormData({ ...formData, data_nascimento: e.target.value })}
             error={formErrors.data_nascimento}
-          />
-
-          <Input
-            label="Senha Inicial"
-            type="password"
-            placeholder="Mínimo 8 caracteres (letras e números)"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            error={formErrors.password}
-            required
           />
 
           <div className="space-y-1.5">

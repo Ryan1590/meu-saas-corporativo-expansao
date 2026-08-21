@@ -150,15 +150,36 @@ export const RegisterView: React.FC<RegisterViewProps> = ({ onNavigate }) => {
 export const ForgotPasswordView: React.FC<{ onNavigate: (path: string) => void }> = ({
   onNavigate,
 }) => {
-  const { success } = useToast();
+  const { success, error: toastError } = useToast();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    setSent(true);
-    success(`Link de recuperação enviado para ${email}`, 'E-mail Enviado');
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/v1/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        toastError(json.message || 'Não foi possível enviar o link de recuperação.', 'Erro');
+        return;
+      }
+
+      setSent(true);
+      success(json.message || `Link de recuperação enviado para ${email}`, 'E-mail Enviado');
+    } catch (err) {
+      toastError('Falha ao conectar com o servidor.', 'Erro de Rede');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -191,7 +212,7 @@ export const ForgotPasswordView: React.FC<{ onNavigate: (path: string) => void }
             required
           />
 
-          <Button type="submit" variant="primary" size="md" fullWidth>
+          <Button type="submit" variant="primary" size="md" fullWidth isLoading={isLoading}>
             Enviar Link de Recuperação
           </Button>
 
@@ -207,6 +228,112 @@ export const ForgotPasswordView: React.FC<{ onNavigate: (path: string) => void }
           </div>
         </form>
       )}
+    </GuestLayout>
+  );
+};
+
+export const ResetPasswordView: React.FC<{ onNavigate: (path: string) => void }> = ({ onNavigate }) => {
+  const { success, error: toastError } = useToast();
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token') || '';
+  const email = params.get('email') || '';
+  const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError('');
+
+    if (!token || !email) {
+      setError('Este link de definição de senha é inválido ou está incompleto.');
+      return;
+    }
+
+    if (password !== passwordConfirmation) {
+      setError('As senhas não coincidem.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/v1/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          email,
+          password,
+          password_confirmation: passwordConfirmation,
+        }),
+      });
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        setError(json.message || 'Não foi possível definir a nova senha.');
+        return;
+      }
+
+      success('Senha definida com sucesso. Faça login para continuar.', 'Senha Atualizada');
+      onNavigate('/login');
+    } catch (err) {
+      toastError('Falha ao conectar com o servidor.', 'Erro de Rede');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <GuestLayout
+      title="Defina sua senha"
+      subtitle="Escolha uma senha segura para concluir o acesso à sua conta"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4 text-left">
+        <Input
+          label="E-mail"
+          type="email"
+          value={email}
+          leftIcon={<Mail className="w-4 h-4" />}
+          disabled
+        />
+
+        <Input
+          label="Nova Senha"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="Mínimo 8 caracteres"
+          leftIcon={<Lock className="w-4 h-4" />}
+          required
+        />
+
+        <Input
+          label="Confirmar Nova Senha"
+          type="password"
+          value={passwordConfirmation}
+          onChange={(event) => setPasswordConfirmation(event.target.value)}
+          placeholder="Repita a nova senha"
+          leftIcon={<Lock className="w-4 h-4" />}
+          error={error}
+          required
+        />
+
+        <Button type="submit" variant="primary" size="md" fullWidth isLoading={isLoading}>
+          Definir Senha
+        </Button>
+
+        <div className="text-center pt-2">
+          <button
+            type="button"
+            onClick={() => onNavigate('/login')}
+            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Voltar ao Login</span>
+          </button>
+        </div>
+      </form>
     </GuestLayout>
   );
 };
