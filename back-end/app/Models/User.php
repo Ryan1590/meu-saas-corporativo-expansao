@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use App\Notifications\ResetPasswordNotification;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\ActivityLog;
@@ -91,5 +92,10 @@ class User extends Authenticatable
         }
 
         return $this->roles->flatMap->permissions->pluck('name')->unique()->values()->toArray();
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }
