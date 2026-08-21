@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Users,
   ShieldCheck,
-  FileText,
   Sliders,
   History,
   Palette,
@@ -14,14 +13,8 @@ import {
   X,
   Sun,
   Moon,
-  Shield,
-  Layers,
   Terminal,
-  KeyRound,
   MonitorCheck,
-  AlertOctagon,
-  Search,
-  Activity,
   Cake,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -200,10 +193,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
             {(isSidebarOpen || isMobileMenuOpen) && (
               <div className="flex flex-col text-left">
                 <span className="font-bold text-base text-white tracking-tight leading-tight">
-                  Meu SaaS Corporativo
+                  Expansão Gazin
                 </span>
                 <span className="text-[10px] text-slate-400 font-medium">
-                  Laravel 11 + React Base
+                  Gestão de Filiais
                 </span>
               </div>
             )}
@@ -300,7 +293,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
                   {user?.name || 'Admin User'}
                 </p>
                 <p className="text-[10px] text-slate-400 truncate">
-                  {user?.email || 'admin@enterprise.com'}
+                  {user?.email || 'admin@expansao-gazin.com'}
                 </p>
               </div>
             )}

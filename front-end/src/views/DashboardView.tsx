@@ -6,13 +6,7 @@ import {
   ShieldCheck,
   TrendingUp,
   Activity,
-  ArrowUpRight,
-  Plus,
-  ShieldAlert,
-  ArrowRight,
-  Terminal,
   Clock,
-  Sparkles,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -22,15 +16,9 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
 import { Card } from '../components/design-system/Badge';
 import { Button } from '../components/design-system/Button';
-import { Badge } from '../components/design-system/Badge';
 import { Avatar } from '../components/design-system/Badge';
 import { Skeleton } from '../components/design-system/Tabs';
 import { DashboardMetrics } from '../types';
@@ -117,6 +105,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
       bgIcon: 'bg-purple-50 dark:bg-purple-950/60',
       trendPositive: true,
     },
+
   ];
 
   return (
@@ -167,10 +156,10 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
           <div className="flex justify-between items-start">
             <div className="space-y-1">
               <p className="text-xs font-semibold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
-                Saúde da API
+                 Usuários Ativos
               </p>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
-                99.9%
+               {metrics.activeUsers ? metrics.activeUsers : 0}
               </h3>
             </div>
             <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/60 rounded-lg text-emerald-600 dark:text-emerald-400">
@@ -179,7 +168,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
           </div>
           <div className="mt-4 flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span>Tokens Sanctum ativos</span>
+            <span>Total Usuários Ativos</span>
           </div>
         </div>
 
@@ -190,7 +179,7 @@ export const DashboardView: React.FC<{ onNavigate: (path: string) => void }> = (
                 Eventos de Hoje
               </p>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
-                {metrics.recentActivities.length * 12 + 148}
+                {metrics.recentActivities.length ? metrics.recentActivities.length : 0}
               </h3>
             </div>
             <div className="p-2.5 bg-orange-50 dark:bg-orange-950/60 rounded-lg text-orange-600 dark:text-orange-400">
