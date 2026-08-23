@@ -47,6 +47,14 @@ cd meu-saas-corporativo
 # 2) BACK-END - INSTALAR DEPENDÊNCIAS PHP
 cd back-end
 composer install
+# observação: se der erro, o Laravel não está encontrando a pasta bootstrap/cache ou não consegue escrever nela: erro The ...\bootstrap\cache directory must be present and writable.
+# para resolver entre na pasta back-end pelo powershell e Remova e recrie bootstrap/cache: 
+# Remove-Item -Recurse -Force .\bootstrap\cache -ErrorAction SilentlyContinue
+# New-Item -ItemType Directory -Path .\bootstrap\cache -Force
+# Confira:Get-Item .\bootstrap\cache
+# 3. Dê permissão para seu usuário: icacls ".\bootstrap\cache" /grant "$env:USERNAME:(OI)(CI)F" /T
+# depois: icacls ".\bootstrap\cache"
+
 
 # 3) BACK-END - CRIAR .ENV E CHAVE DA APP
 Copy-Item .env.example .env -Force
