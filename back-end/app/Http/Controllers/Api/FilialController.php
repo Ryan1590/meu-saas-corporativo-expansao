@@ -77,9 +77,9 @@ class FilialController extends Controller
                 ]);
             }
 
-            $csvContent = "\xEF\xBB\xBF" . implode("\n", $csvData);
+            $csvContent = "\xEF\xBB\xBF" . implode("\r\n", $csvData);
             return response($csvContent, 200, [
-                'Content-Type' => 'text/csv; charset=UTF-8',
+                'Content-Type' => 'text/csv; charset=UTF-8; header=present',
                 'Content-Disposition' => 'attachment; filename="filiais_' . date('Ymd_His') . '.csv"',
             ]);
         }

@@ -453,9 +453,9 @@ class DashboardController extends Controller
             $csvLines[] = $item['linha'];
         }
 
-        $csvContent = "\xEF\xBB\xBF" . implode("\n", $csvLines);
+        $csvContent = "\xEF\xBB\xBF" . implode("\r\n", $csvLines);
         return response($csvContent, 200, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Type' => 'text/csv; charset=UTF-8; header=present',
             'Content-Disposition' => 'attachment; filename="proximos_vencimentos_' . date('Ymd_His') . '.csv"',
         ]);
     }
@@ -502,9 +502,9 @@ class DashboardController extends Controller
             }
         }
 
-        $csvContent = "\xEF\xBB\xBF" . implode("\n", $csvLines);
+        $csvContent = "\xEF\xBB\xBF" . implode("\r\n", $csvLines);
         return response($csvContent, 200, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Type' => 'text/csv; charset=UTF-8; header=present',
             'Content-Disposition' => 'attachment; filename="documentos_faltando_' . date('Ymd_His') . '.csv"',
         ]);
     }
