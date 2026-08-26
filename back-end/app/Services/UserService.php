@@ -43,6 +43,7 @@ class UserService
 
         return User::query()
             ->with(['roles.permissions'])
+            ->where('email', '!=', 'admin@empresa.com')
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
@@ -100,11 +101,11 @@ class UserService
     {
         return DB::transaction(function () use ($user, $data, $updater) {
             $updateFields = [
-                'name' => $data['name'] ?? $user->name,
-                'email' => $data['email'] ?? $user->email,
-                'data_nascimento' => $data['data_nascimento'] ?? $user->data_nascimento,
-                'avatar' => $data['avatar'] ?? $user->avatar,
-                'status' => $data['status'] ?? $user->status,
+                'name' => array_key_exists('name', $data) ? $data['name'] : $user->name,
+                'email' => array_key_exists('email', $data) ? $data['email'] : $user->email,
+                'data_nascimento' => array_key_exists('data_nascimento', $data) ? $data['data_nascimento'] : $user->data_nascimento,
+                'avatar' => array_key_exists('avatar', $data) ? $data['avatar'] : $user->avatar,
+                'status' => array_key_exists('status', $data) ? $data['status'] : $user->status,
             ];
 
             if (!empty($data['password'])) {
