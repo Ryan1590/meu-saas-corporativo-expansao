@@ -6,19 +6,57 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      - name: Upload do projeto completo
+
+      - name: Deploy Backend Laravel
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./
-          server-dir: /expansao.hrsistememas.com.br/
+
+          local-dir: ./back-end/
+          server-dir: /expansao.hrsistememas.com.br/back-end/
+
           exclude: |
             **/.git/**
             **/.github/**
             **/node_modules/**
+            **/vendor/**
+            **/.env
+            **/storage/logs/**
+            **/storage/framework/cache/**
+            **/storage/framework/sessions/**
+            **/storage/framework/views/**
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        working-directory: ./front-end
+        run: npm ci
+
+      - name: Build Front-end
+        working-directory: ./front-end
+        run: npm run build
+
+      - name: Deploy Front-end
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+
+          local-dir: ./front-end/dist/
+          server-dir: /expansao.hrsistememas.com.br/
+          
+          exclude: |
+            **/.git/**
+            **/.github/**
