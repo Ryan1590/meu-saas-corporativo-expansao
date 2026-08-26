@@ -16,6 +16,20 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    private function cleanText(?string $text): string
+    {
+        if (is_null($text) || $text === '') {
+            return '';
+        }
+
+        if (str_contains(bin2hex($text), 'efbfbd') || str_contains($text, '')) {
+            $text = str_replace('', '', $text);
+            $text = preg_replace('/\x{EF}\xBB\xBF/u', '', $text);
+        }
+
+        return trim($text);
+    }
+
     /**
      * Legacy System Events & User Metrics (Admin Only)
      */
@@ -258,7 +272,7 @@ class DashboardController extends Controller
 
                         $proximosVencimentosList[] = [
                             'idfilial' => $f->idfilial,
-                            'filial' => $f->filial,
+                            'filial' => $this->cleanText($f->filial),
                             'uf' => $f->uf ?? 'PR',
                             'documento' => $label,
                             'vencimento' => $venc->format('Y-m-d'),
@@ -272,7 +286,7 @@ class DashboardController extends Controller
 
                         $proximosVencimentosList[] = [
                             'idfilial' => $f->idfilial,
-                            'filial' => $f->filial,
+                            'filial' => $this->cleanText($f->filial),
                             'uf' => $f->uf ?? 'PR',
                             'documento' => $label,
                             'vencimento' => $venc->format('Y-m-d'),
@@ -312,7 +326,7 @@ class DashboardController extends Controller
             if (!empty($fDocsMissingNames)) {
                 $faltandoList[] = [
                     'idfilial' => $f->idfilial,
-                    'filial' => $f->filial,
+                    'filial' => $this->cleanText($f->filial),
                     'uf' => $f->uf ?? 'PR',
                     'documentos' => $fDocsMissingNames,
                 ];
@@ -432,7 +446,7 @@ class DashboardController extends Controller
                         'vencimento' => $venc->format('Y-m-d'),
                         'linha' => implode(';', [
                             $f->idfilial,
-                            $f->filial,
+                            $this->cleanText($f->filial),
                             $f->uf ?? 'PR',
                             $label,
                             $venc->format('d/m/Y'),
@@ -495,7 +509,7 @@ class DashboardController extends Controller
             if (!empty($missing)) {
                 $csvLines[] = implode(';', [
                     $f->idfilial,
-                    $f->filial,
+                    $this->cleanText($f->filial),
                     $f->uf ?? 'PR',
                     implode(', ', $missing),
                 ]);

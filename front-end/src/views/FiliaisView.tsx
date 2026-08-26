@@ -32,6 +32,7 @@ interface FiliaisViewProps {
 }
 
 const UFS_BRASIL = [
+  { value: '', label: 'Selecione a UF...' },
   { value: 'AC', label: 'AC - Acre' },
   { value: 'AL', label: 'AL - Alagoas' },
   { value: 'AP', label: 'AP - Amapá' },
@@ -93,10 +94,10 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
   const [formData, setFormData] = useState({
     idfilial: '',
     filial: '',
-    uf: 'PR',
-    predio: 'Próprio',
+    uf: '',
+    predio: '',
     metragem_quadrada: '',
-    tipo: 'Loja',
+    tipo: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -193,6 +194,7 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
     const errors: Record<string, string> = {};
     if (!formData.idfilial) errors.idfilial = 'ID da Filial é obrigatório';
     if (!formData.filial) errors.filial = 'Nome da Filial é obrigatório';
+    if (!formData.uf) errors.uf = 'UF é obrigatória';
     if (!formData.predio) errors.predio = 'Prédio é obrigatório';
     if (!formData.metragem_quadrada) errors.metragem_quadrada = 'Metragem quadrada é obrigatória';
     if (!formData.tipo) errors.tipo = 'Tipo é obrigatório';
@@ -423,10 +425,10 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
             setFormData({
               idfilial: '',
               filial: '',
-              uf: 'PR',
-              predio: 'Próprio',
+              uf: '',
+              predio: '',
               metragem_quadrada: '',
-              tipo: 'Loja',
+              tipo: '',
             });
             setFormErrors({});
             setIsAddModalOpen(true);
@@ -750,6 +752,7 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                   <Select
                     value={formData.uf}
                     onChange={(e) => setFormData({ ...formData, uf: e.target.value })}
+                    error={formErrors.uf}
                     options={UFS_BRASIL}
                   />
                 </div>
@@ -761,7 +764,9 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                   <Select
                     value={formData.predio}
                     onChange={(e) => setFormData({ ...formData, predio: e.target.value })}
+                    error={formErrors.predio}
                     options={[
+                      { value: '', label: 'Selecione o prédio...' },
                       { value: 'Próprio', label: 'Próprio' },
                       { value: 'Terceiro', label: 'Terceiro' },
                       { value: 'Próprio/Terceiro', label: 'Próprio / Alugado' },
@@ -793,7 +798,9 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                   <Select
                     value={formData.tipo}
                     onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+                    error={formErrors.tipo}
                     options={[
+                      { value: '', label: 'Selecione o tipo...' },
                       { value: 'Loja', label: 'Loja' },
                       { value: 'Indústria', label: 'Indústria' },
                       { value: 'Centro de Distribuição', label: 'Centro de Distribuição' },
