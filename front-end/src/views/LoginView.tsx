@@ -14,8 +14,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ onNavigate }) => {
   const { login } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const [email, setEmail] = useState('admin@empresa.com');
-  const [password, setPassword] = useState('Admin@2026!Secure');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);

@@ -722,7 +722,7 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                 </label>
                 <Input
                   type="number"
-                  placeholder="Ex: 1001"
+                  placeholder="ID da Filial"
                   value={formData.idfilial}
                   onChange={(e) => setFormData({ ...formData, idfilial: e.target.value })}
                   error={formErrors.idfilial}
@@ -736,7 +736,7 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                 </label>
                 <Input
                   type="text"
-                  placeholder="Ex: Douradina - PR"
+                  placeholder="Nome da Filial"
                   value={formData.filial}
                   onChange={(e) => setFormData({ ...formData, filial: e.target.value })}
                   error={formErrors.filial}
@@ -766,7 +766,7 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                     onChange={(e) => setFormData({ ...formData, predio: e.target.value })}
                     error={formErrors.predio}
                     options={[
-                      { value: '', label: 'Selecione o prédio...' },
+                      { value: '', label: 'Selecione...' },
                       { value: 'Próprio', label: 'Próprio' },
                       { value: 'Terceiro', label: 'Terceiro' },
                       { value: 'Próprio/Terceiro', label: 'Próprio / Alugado' },
@@ -783,7 +783,7 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                   <Input
                     type="number"
                     step="0.01"
-                    placeholder="Ex: 1500"
+                    placeholder="Metragem Quadrada"
                     value={formData.metragem_quadrada}
                     onChange={(e) => setFormData({ ...formData, metragem_quadrada: e.target.value })}
                     error={formErrors.metragem_quadrada}
@@ -800,7 +800,7 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                     onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
                     error={formErrors.tipo}
                     options={[
-                      { value: '', label: 'Selecione o tipo...' },
+                      { value: '', label: 'Selecione...' },
                       { value: 'Loja', label: 'Loja' },
                       { value: 'Indústria', label: 'Indústria' },
                       { value: 'Centro de Distribuição', label: 'Centro de Distribuição' },
