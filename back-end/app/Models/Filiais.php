@@ -34,19 +34,29 @@ class Filiais extends Model
     {
         return Attribute::make(
             get: function ($value, $attributes) {
-                // Tenta pegar do $value ou direto do array de atributos do banco
                 $val = $value ?? ($attributes['metragem_quadrada'] ?? null);
 
                 if (is_null($val) || $val === '') {
                     return 0.0;
                 }
 
-                // Se for string com vírgula (ex: "100,30" ou "1.250,50")
+                if (is_numeric($val)) {
+                    return (float) $val;
+                }
+
                 if (is_string($val)) {
-                    // Se contiver vírgula, limpa os pontos de milhar e troca vírgula por ponto
-                    if (str_contains($val, ',')) {
-                        $val = str_replace('.', '', $val);
+                    $val = trim($val);
+                    if (str_contains($val, ',') && str_contains($val, '.')) {
+                        if (strrpos($val, ',') > strrpos($val, '.')) {
+                            $val = str_replace('.', '', $val);
+                            $val = str_replace(',', '.', $val);
+                        } else {
+                            $val = str_replace(',', '', $val);
+                        }
+                    } elseif (str_contains($val, ',')) {
                         $val = str_replace(',', '.', $val);
+                    } elseif (preg_match('/^\d{1,3}\.\d{3}$/', $val)) {
+                        $val = str_replace('.', '', $val);
                     }
                 }
 
@@ -54,7 +64,7 @@ class Filiais extends Model
             },
 
             set: fn ($value) => is_string($value)
-                ? str_replace(['.', ','], ['', '.'], $value)
+                ? (str_contains($value, ',') ? str_replace(['.', ','], ['', '.'], $value) : $value)
                 : $value
         );
     }

@@ -135,24 +135,55 @@ class DashboardController extends Controller
         $filiais = Filiais::all();
         $totalFiliais = $filiais->count();
 
-        $totalPredioProprio = $filiais->where('predio', 'Próprio')->count();
-        $totalPredioTerceiro = $filiais->where('predio', 'Terceiro')->count();
-        $totalPredioProprioTerceiro = $filiais->filter(fn ($f) => in_array($f->predio, ['Próprio/Terceiro', 'PRÓPRIO/ALUGADO']))->count();
+        $normalize = function (?string $str): string {
+            if (!$str) return '';
+            $str = mb_strtolower(trim($str));
+            $str = preg_replace('/[áàãâä]/u', 'a', $str);
+            $str = preg_replace('/[éèêë]/u', 'e', $str);
+            $str = preg_replace('/[íìîï]/u', 'i', $str);
+            $str = preg_replace('/[óòõôö]/u', 'o', $str);
+            $str = preg_replace('/[úùûü]/u', 'u', $str);
+            $str = preg_replace('/[ç]/u', 'c', $str);
+            return $str;
+        };
 
-        $industrias = $filiais->where('tipo', 'Indústria');
+        $parseMetragem = function ($val): float {
+            if (is_null($val) || $val === '') return 0.0;
+            if (is_numeric($val)) return (float) $val;
+            $val = trim((string) $val);
+            if (str_contains($val, ',') && str_contains($val, '.')) {
+                if (strrpos($val, ',') > strrpos($val, '.')) {
+                    $val = str_replace('.', '', $val);
+                    $val = str_replace(',', '.', $val);
+                } else {
+                    $val = str_replace(',', '', $val);
+                }
+            } elseif (str_contains($val, ',')) {
+                $val = str_replace(',', '.', $val);
+            } elseif (preg_match('/^\d{1,3}\.\d{3}$/', $val)) {
+                $val = str_replace('.', '', $val);
+            }
+            return (float) $val;
+        };
+
+        $totalPredioProprio = $filiais->filter(fn ($f) => $normalize($f->predio) === 'proprio')->count();
+        $totalPredioTerceiro = $filiais->filter(fn ($f) => $normalize($f->predio) === 'terceiro')->count();
+        $totalPredioProprioTerceiro = $filiais->filter(fn ($f) => str_contains($normalize($f->predio), 'proprio') && (str_contains($normalize($f->predio), 'terceiro') || str_contains($normalize($f->predio), 'alugado')))->count();
+
+        $industrias = $filiais->filter(fn ($f) => str_contains($normalize($f->tipo), 'industria') || str_contains($normalize($f->tipo), 'fabrica'));
         $totalIndustria = $industrias->count();
-        $totalMetragemIndustria = $industrias->sum(fn ($f) => (float) $f->metragem_quadrada);
+        $totalMetragemIndustria = $industrias->sum(fn ($f) => $parseMetragem($f->metragem_quadrada));
 
-        $lojas = $filiais->where('tipo', 'Loja');
+        $lojas = $filiais->filter(fn ($f) => str_contains($normalize($f->tipo), 'loja'));
         $totalLojas = $lojas->count();
-        $totalMetragemLojas = $lojas->sum(fn ($f) => (float) $f->metragem_quadrada);
+        $totalMetragemLojas = $lojas->sum(fn ($f) => $parseMetragem($f->metragem_quadrada));
 
-        $cds = $filiais->where('tipo', 'Centro de Distribuição');
+        $cds = $filiais->filter(fn ($f) => str_contains($normalize($f->tipo), 'centro de distribuicao') || $normalize($f->tipo) === 'cd' || $normalize($f->tipo) === 'cds');
         $totalCentroDistribuicao = $cds->count();
-        $totalMetragemCD = $cds->sum(fn ($f) => (float) $f->metragem_quadrada);
+        $totalMetragemCD = $cds->sum(fn ($f) => $parseMetragem($f->metragem_quadrada));
 
-        $autopostos = $filiais->where('tipo', 'Auto Posto Gazin');
-        $totalMetragemAutoPosto = $autopostos->sum(fn ($f) => (float) $f->metragem_quadrada);
+        $autopostos = $filiais->filter(fn ($f) => str_contains($normalize($f->tipo), 'posto'));
+        $totalMetragemAutoPosto = $autopostos->sum(fn ($f) => $parseMetragem($f->metragem_quadrada));
 
         // 2. Documental Metrics & Status
         $documentosAll = FilialDocumento::all()->keyBy('idfilial');
