@@ -26,6 +26,7 @@ import { Tabs } from '../components/design-system/Tabs';
 import { Badge } from '../components/design-system/Badge';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { Eraser } from 'lucide-react';
 
 interface FiliaisViewProps {
   onNavigate: (path: string) => void;
@@ -435,7 +436,7 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
           }}
           className="shadow-sm"
         >
-          <Plus className="w-4 h-4 me-1.5" /> Cadastrar Filial
+          <Plus className="w-4 h-4 me-1.5" />
         </Button>
       </div>
 
@@ -449,13 +450,13 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
 
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={handleClearFilters}>
-              <XCircle className="w-3.5 h-3.5 me-1 text-slate-400" /> Limpar
+              <Eraser className="w-3.5 h-3.5 me-1 text-slate-400" /> 
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportCsv}>
-              <Download className="w-3.5 h-3.5 me-1 text-emerald-500" /> Exportar CSV
+              <Download className="w-3.5 h-3.5 me-1 text-emerald-500" />
             </Button>
             <Button variant="primary" size="sm" onClick={fetchFiliais}>
-              <Filter className="w-3.5 h-3.5 me-1" /> Filtrar
+              <Filter className="w-3.5 h-3.5 me-1" />
             </Button>
           </div>
         </div>

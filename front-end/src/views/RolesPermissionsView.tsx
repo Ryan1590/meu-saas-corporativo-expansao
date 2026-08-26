@@ -4,13 +4,6 @@ import {
   Plus,
   Edit2,
   Trash2,
-  Users,
-  Check,
-  Lock,
-  Search,
-  Layers,
-  Key,
-  Shield,
 } from 'lucide-react';
 import { Role, Permission } from '../types';
 import { Button } from '../components/design-system/Button';

@@ -380,7 +380,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
               {metaVenc.total} registros
             </Badge>
             <Button variant="outline" size="sm" onClick={handleExportVencimentos}>
-              <FileSpreadsheet className="w-3.5 h-3.5 me-1 text-emerald-500" /> Exportar
+              <FileSpreadsheet className="w-3.5 h-3.5 me-1 text-emerald-500" />
             </Button>
           </div>
         </div>
@@ -476,7 +476,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
               {metaFalt.total} filiais
             </Badge>
             <Button variant="outline" size="sm" onClick={handleExportFaltando}>
-              <FileSpreadsheet className="w-3.5 h-3.5 me-1 text-emerald-500" /> Exportar
+              <FileSpreadsheet className="w-3.5 h-3.5 me-1 text-emerald-500" />
             </Button>
           </div>
         </div>
