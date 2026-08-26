@@ -98,16 +98,53 @@ export interface DashboardMetrics {
 export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
-  data: T;
+  data?: T;
   meta?: {
     currentPage: number;
     lastPage: number;
     perPage: number;
     total: number;
-    from: number;
-    to: number;
   };
   errors?: Record<string, string[]>;
+}
+
+export interface Filial {
+  id?: number;
+  idfilial: number;
+  filial: string;
+  uf?: string;
+  predio: string;
+  metragem_quadrada: number | string;
+  tipo: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface FilialDocumento {
+  id?: number;
+  idfilial: number;
+  alvara_corpo_bombeiro_path?: string | null;
+  alvara_corpo_bombeiro_vencimento?: string | null;
+  alvara_funcionamento_path?: string | null;
+  alvara_funcionamento_vencimento?: string | null;
+  alvara_ambiental_path?: string | null;
+  alvara_ambiental_vencimento?: string | null;
+  certificado_brigada_path?: string | null;
+  certificado_brigada_vencimento?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface DocumentoStatus {
+  tipo: 'dentro_prazo' | 'vencido' | 'sem_data';
+  texto: string;
+}
+
+export interface FilialDocumentosData {
+  filial: Filial;
+  documentos: FilialDocumento;
+  statusDocumentos: Record<string, DocumentoStatus>;
+  documentosObrigatorios: string[];
 }
 
 export interface ApiToken {

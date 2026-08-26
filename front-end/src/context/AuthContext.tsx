@@ -20,7 +20,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Route to permission mappings
 export const ROUTE_PERMISSIONS: Record<string, string> = {
   '/dashboard': 'dashboard.view',
+  '/eventos-sistema': 'admin',
   '/birthdays': 'birthdays.view',
+  '/filiais': 'filiais.view',
+  '/filiais/documentos': 'filiais.view',
   '/users': 'users.view',
   '/users/create': 'users.create',
   '/roles': 'roles.view',
@@ -126,7 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Screen permission protection validator
   const canAccessRoute = useCallback(
     (routePath: string): boolean => {
-      const requiredPermission = ROUTE_PERMISSIONS[routePath];
+      const cleanPath = routePath.split('?')[0];
+      const requiredPermission = ROUTE_PERMISSIONS[cleanPath];
       if (!requiredPermission) return true; // public or unrestricted authenticated route
       return can(requiredPermission);
     },

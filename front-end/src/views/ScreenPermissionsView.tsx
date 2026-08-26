@@ -43,6 +43,20 @@ export const ScreenPermissionsView: React.FC<{ onNavigate: (path: string) => voi
       actions: ['Visualizar KPIs', 'Ver Gráficos'],
     },
     {
+      screen: 'Gestão de Filiais',
+      path: '/filiais',
+      permission: 'filiais.view',
+      description: 'Cadastro, importação CSV, metragem, prédios e lista de filiais.',
+      actions: ['Listar filiais', 'Cadastrar filial', 'Importar CSV', 'Exportar CSV', 'Editar', 'Excluir'],
+    },
+    {
+      screen: 'Documentos da Filial',
+      path: '/filiais/documentos',
+      permission: 'filiais.view',
+      description: 'Anexo de alvarás, certificados, datas de vencimento e exportação ZIP.',
+      actions: ['Anexar documentos', 'Marcar obrigatório', 'Definir vencimentos', 'Exportar ZIP'],
+    },
+    {
       screen: 'Listagem de Usuários',
       path: '/users',
       permission: 'users.view',

@@ -16,6 +16,9 @@ import {
   Terminal,
   MonitorCheck,
   Cake,
+  Building,
+  FolderCheck,
+  Activity,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -68,6 +71,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
           permission: 'dashboard.view',
         },
         {
+          id: 'filiais',
+          label: 'Filiais',
+          icon: <Building className="w-4 h-4" />,
+          path: '/filiais',
+          permission: 'filiais.view',
+        },
+        {
           id: 'birthdays',
           label: 'Aniversariantes',
           icon: <Cake className="w-4 h-4" />,
@@ -108,6 +118,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
           icon: <History className="w-4 h-4" />,
           path: '/logs',
           permission: 'logs.view',
+        },
+        {
+          id: 'eventos-sistema',
+          label: 'Eventos do Sistema',
+          icon: <Activity className="w-4 h-4" />,
+          path: '/eventos-sistema',
+          adminOnly: true,
+          badge: <Badge variant="purple" size="sm">Admin</Badge>,
         },
       ],
     },
@@ -157,7 +175,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
   const getPageTitle = (path: string) => {
     switch (path) {
       case '/dashboard': return 'Dashboard';
-      case '/birthdays': return 'Aniversariantes';
+      case '/eventos-sistema': return 'Eventos do Sistema';
+      case '/filiais': return 'Filiais';
+      case '/filiais/documentos': return 'Documentos da Filial';
       case '/users': return 'Usuários';
       case '/roles': return 'Perfis & Roles';
       case '/screen-permissions': return 'Acesso por Tela';

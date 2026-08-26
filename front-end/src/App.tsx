@@ -6,7 +6,10 @@ import { AppLayout } from './layouts/AppLayout';
 import { LoginView } from './views/LoginView';
 import { RegisterView, ForgotPasswordView, ResetPasswordView } from './views/RegisterView';
 import { DashboardView } from './views/DashboardView';
+import { SystemEventsView } from './views/SystemEventsView';
 import { BirthdaysView } from './views/BirthdaysView';
+import { FiliaisView } from './views/FiliaisView';
+import { FilialDocumentosView } from './views/FilialDocumentosView';
 import { UsersView } from './views/UsersView';
 import { RolesPermissionsView } from './views/RolesPermissionsView';
 import { ScreenPermissionsView } from './views/ScreenPermissionsView';
@@ -65,8 +68,9 @@ const MainRouter: React.FC = () => {
   }
 
   // Route permission check (Layer 2 of the 5-Layer Security Architecture)
-  const isAllowed = canAccessRoute(currentPath);
-  const requiredPerm = ROUTE_PERMISSIONS[currentPath];
+  const basePath = currentPath.split('?')[0];
+  const isAllowed = canAccessRoute(basePath);
+  const requiredPerm = ROUTE_PERMISSIONS[basePath];
 
   // Render view inside AppLayout
   const renderCurrentView = () => {
@@ -79,11 +83,17 @@ const MainRouter: React.FC = () => {
       );
     }
 
-    switch (currentPath) {
+    switch (basePath) {
       case '/dashboard':
         return <DashboardView onNavigate={navigate} />;
+      case '/eventos-sistema':
+        return <SystemEventsView onNavigate={navigate} />;
       case '/birthdays':
         return <BirthdaysView />;
+      case '/filiais':
+        return <FiliaisView onNavigate={navigate} />;
+      case '/filiais/documentos':
+        return <FilialDocumentosView onNavigate={navigate} />;
       case '/users':
       case '/users/create':
       case '/users/edit':

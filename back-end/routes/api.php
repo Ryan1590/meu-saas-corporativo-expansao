@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BirthdayController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\FilialController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\SettingController;
@@ -28,8 +29,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/auth/switch-demo-user', [AuthController::class, 'switchDemoUser']);
         Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
 
-        // Dashboard
-        Route::get('/dashboard/metrics', [DashboardController::class, 'metrics']);
+        // Dashboard & Eventos
+        Route::get('/dashboard/metrics', [DashboardController::class, 'index']);
+        Route::get('/dashboard/system-events', [DashboardController::class, 'systemEvents']);
+        Route::get('/dashboard/exportar/vencimentos', [DashboardController::class, 'exportarVencimentos']);
+        Route::get('/dashboard/exportar/faltando', [DashboardController::class, 'exportarFaltando']);
         Route::get('/birthdays', [BirthdayController::class, 'index']);
 
         // Gestão de Usuários
@@ -47,5 +51,14 @@ Route::prefix('v1')->group(function () {
         // Configurações
         Route::get('/settings', [SettingController::class, 'index']);
         Route::put('/settings', [SettingController::class, 'update']);
+
+        // Gestão de Filiais
+        Route::post('/filiais/import', [FilialController::class, 'import']);
+        Route::get('/filiais/{idfilial}/documentos', [FilialController::class, 'getDocumentos']);
+        Route::post('/filiais/{idfilial}/documentos', [FilialController::class, 'updateDocumentos']);
+        Route::get('/filiais/{idfilial}/documentos/exportar', [FilialController::class, 'exportarZip']);
+        Route::get('/filiais/{idfilial}/documentos/exportar/{tipo}', [FilialController::class, 'exportarIndividual']);
+        Route::get('/filiais/{idfilial}/documentos/arquivo/{tipo}', [FilialController::class, 'showArquivo']);
+        Route::apiResource('filiais', FilialController::class)->parameters(['filiais' => 'idfilial']);
     });
 });
