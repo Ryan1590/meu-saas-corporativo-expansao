@@ -6,11 +6,16 @@ on:
   workflow_dispatch:
 
 jobs:
+
+  # ============================================================
+  # BACK-END - LARAVEL
+  # ============================================================
   deploy-backend:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Baixar código
+        uses: actions/checkout@v4
 
       - name: Deploy Backend Laravel
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -25,19 +30,31 @@ jobs:
           exclude: |
             **/.git/**
             **/.github/**
-            **/node_modules/**
-            **/vendor/**
             **/.env
+            **/.env.example
+            **/node_modules/**
             **/storage/logs/**
             **/storage/framework/cache/**
             **/storage/framework/sessions/**
             **/storage/framework/views/**
 
+
+  # ============================================================
+  # FRONT-END - REACT / VITE
+  # ============================================================
   deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: front-end/package-lock.json
 
       - name: Instalar dependências
         working-directory: ./front-end
@@ -56,7 +73,7 @@ jobs:
 
           local-dir: ./front-end/dist/
           server-dir: /expansao.hrsistememas.com.br/
-          
+
           exclude: |
             **/.git/**
             **/.github/**
