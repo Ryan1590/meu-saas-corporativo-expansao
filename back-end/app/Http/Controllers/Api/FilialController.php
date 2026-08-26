@@ -132,40 +132,124 @@ class FilialController extends Controller
     public function import(Request $request): JsonResponse
     {
         $request->validate([
-            'planilha' => 'required|file|mimes:csv,txt|max:10240',
+            'planilha' => 'required|file|max:10240',
         ]);
 
         $file = $request->file('planilha');
-        $handle = fopen($file->getRealPath(), 'r');
-        if (!$handle) {
+        $ext = strtolower($file->getClientOriginalExtension());
+        if (!in_array($ext, ['csv', 'txt'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Não foi possível abrir o arquivo fornecido.',
+                'message' => 'O arquivo de planilha deve ser no formato .csv ou .txt',
             ], 422);
         }
 
-        $header = null;
+        $realPath = $file->getRealPath();
+        if (!$realPath || !file_exists($realPath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Não foi possível ler o arquivo enviado.',
+            ], 422);
+        }
+
+        $content = file_get_contents($realPath);
+        if ($content === false || trim($content) === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'O arquivo fornecido está vazio.',
+            ], 422);
+        }
+
+        // Auto-detect & convert encoding to UTF-8
+        if (!mb_check_encoding($content, 'UTF-8')) {
+            $content = mb_convert_encoding($content, 'UTF-8', 'ISO-8859-1, Windows-1252, MacRoman');
+        }
+
+        // Strip UTF-8 BOM
+        $content = preg_replace('/\x{EF}\xBB\xBF/u', '', $content);
+
+        // Normalize newlines
+        $content = str_replace(["\r\n", "\r"], "\n", $content);
+        $lines = array_filter(explode("\n", $content), fn ($l) => trim($l) !== '');
+
+        if (empty($lines)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nenhuma linha válida encontrada no arquivo CSV.',
+            ], 422);
+        }
+
+        // Auto-detect delimiter from first line
+        $firstLine = reset($lines);
+        $delimiter = ';';
+        $countSemicolon = substr_count($firstLine, ';');
+        $countComma = substr_count($firstLine, ',');
+        $countTab = substr_count($firstLine, "\t");
+        if ($countComma > $countSemicolon && $countComma > $countTab) {
+            $delimiter = ',';
+        } elseif ($countTab > $countSemicolon && $countTab > $countComma) {
+            $delimiter = "\t";
+        }
+
+        $headerRow = array_shift($lines);
+        $rawHeaders = str_getcsv($headerRow, $delimiter);
+
+        $header = array_map(fn ($h) => $this->normalizeHeaderKey($h), $rawHeaders);
+
         $importedCount = 0;
 
-        while (($row = fgetcsv($handle, 1000, ';')) !== false) {
-            if (!$header) {
-                // Remove BOM if present
-                $row[0] = preg_replace('/\x{EF}\xBB\xBF/u', '', $row[0]);
-                $header = array_map('trim', array_map('strtolower', $row));
+        foreach ($lines as $line) {
+            $row = str_getcsv($line, $delimiter);
+            if (empty($row) || count($row) === 0) {
                 continue;
+            }
+
+            // Pad or slice row to match header length
+            if (count($row) < count($header)) {
+                $row = array_pad($row, count($header), '');
+            } elseif (count($row) > count($header)) {
+                $row = array_slice($row, 0, count($header));
             }
 
             $data = array_combine($header, array_map('trim', $row));
-            if (!$data || empty($data['idfilial']) || empty($data['filial'])) {
+            if (!$data) {
                 continue;
             }
 
-            $idfilial = (int) $data['idfilial'];
-            $filialNome = $data['filial'];
-            $uf = $data['uf'] ?? 'PR';
-            $predio = $data['predio'] ?? 'Próprio';
-            $metragem = $data['metragem_quadrada'] ?? '0';
-            $tipo = $data['tipo'] ?? 'Loja';
+            $idfilialRaw = $data['idfilial'] ?? '';
+            $idfilial = (int) preg_replace('/[^0-9]/', '', $idfilialRaw);
+            $filialNome = trim($data['filial'] ?? '');
+
+            if (!$idfilial || empty($filialNome)) {
+                continue;
+            }
+
+            $uf = strtoupper(trim($data['uf'] ?? 'PR'));
+            if (empty($uf) || strlen($uf) > 2) {
+                $uf = 'PR';
+            }
+
+            $predioRaw = mb_strtolower(trim($data['predio'] ?? 'próprio'));
+            if (str_contains($predioRaw, 'terceiro') && (str_contains($predioRaw, 'proprio') || str_contains($predioRaw, 'próprio') || str_contains($predioRaw, 'alugado'))) {
+                $predio = 'Próprio/Terceiro';
+            } elseif (str_contains($predioRaw, 'terceiro') || str_contains($predioRaw, 'alugado')) {
+                $predio = 'Terceiro';
+            } else {
+                $predio = 'Próprio';
+            }
+
+            $metragem = trim($data['metragem_quadrada'] ?? '0');
+
+            $tipoRaw = mb_strtolower(trim($data['tipo'] ?? 'loja'));
+            if (str_contains($tipoRaw, 'ind') || str_contains($tipoRaw, 'fabrica')) {
+                $tipo = 'Indústria';
+            } elseif (str_contains($tipoRaw, 'cd') || str_contains($tipoRaw, 'distribui')) {
+                $tipo = 'Centro de Distribuição';
+            } elseif (str_contains($tipoRaw, 'posto')) {
+                $tipo = 'Auto Posto Gazin';
+            } else {
+                $tipo = 'Loja';
+            }
 
             $filial = Filiais::updateOrCreate(
                 ['idfilial' => $idfilial],
@@ -185,12 +269,53 @@ class FilialController extends Controller
             $importedCount++;
         }
 
-        fclose($handle);
-
         return response()->json([
             'success' => true,
             'message' => "{$importedCount} filial(is) importada(s) com sucesso!",
         ]);
+    }
+
+    private function normalizeHeaderKey(string $key): string
+    {
+        $key = preg_replace('/\x{EF}\xBB\xBF/u', '', $key);
+        $key = mb_strtolower(trim($key));
+        $key = str_replace(['"', "'"], '', $key);
+
+        $keyUnaccented = preg_replace('/[áàãâä]/u', 'a', $key);
+        $keyUnaccented = preg_replace('/[éèêë]/u', 'e', $keyUnaccented);
+        $keyUnaccented = preg_replace('/[íìîï]/u', 'i', $keyUnaccented);
+        $keyUnaccented = preg_replace('/[óòõôö]/u', 'o', $keyUnaccented);
+        $keyUnaccented = preg_replace('/[úùûü]/u', 'u', $keyUnaccented);
+        $keyUnaccented = preg_replace('/[ç]/u', 'c', $keyUnaccented);
+
+        if (str_contains($keyUnaccented, 'id') && str_contains($keyUnaccented, 'filial')) {
+            return 'idfilial';
+        }
+        if ($keyUnaccented === 'id' || $keyUnaccented === 'id_filial' || $keyUnaccented === 'idfilial') {
+            return 'idfilial';
+        }
+
+        if (str_contains($keyUnaccented, 'filial') || str_contains($keyUnaccented, 'nome')) {
+            return 'filial';
+        }
+
+        if ($keyUnaccented === 'uf' || str_contains($keyUnaccented, 'estado')) {
+            return 'uf';
+        }
+
+        if (str_contains($keyUnaccented, 'predio') || str_contains($keyUnaccented, 'edificio')) {
+            return 'predio';
+        }
+
+        if (str_contains($keyUnaccented, 'metragem') || str_contains($keyUnaccented, 'area') || str_contains($keyUnaccented, 'm2')) {
+            return 'metragem_quadrada';
+        }
+
+        if (str_contains($keyUnaccented, 'tipo') || str_contains($keyUnaccented, 'categoria')) {
+            return 'tipo';
+        }
+
+        return $keyUnaccented;
     }
 
     /**
@@ -214,7 +339,7 @@ class FilialController extends Controller
         $filial = Filiais::where('idfilial', $idfilial)->firstOrFail();
 
         $validated = $request->validate([
-            'idfilial' => 'required|integer|unique:filiais,idfilial,' . $filial->id,
+            'idfilial' => 'required|integer|unique:filiais,idfilial,' . $filial->idfilial . ',idfilial',
             'filial' => 'required|string|max:255',
             'uf' => 'nullable|string|max:2',
             'predio' => 'required|string|max:255',

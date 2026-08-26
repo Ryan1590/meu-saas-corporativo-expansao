@@ -31,6 +31,36 @@ interface FiliaisViewProps {
   onNavigate: (path: string) => void;
 }
 
+const UFS_BRASIL = [
+  { value: 'AC', label: 'AC - Acre' },
+  { value: 'AL', label: 'AL - Alagoas' },
+  { value: 'AP', label: 'AP - Amapá' },
+  { value: 'AM', label: 'AM - Amazonas' },
+  { value: 'BA', label: 'BA - Bahia' },
+  { value: 'CE', label: 'CE - Ceará' },
+  { value: 'DF', label: 'DF - Distrito Federal' },
+  { value: 'ES', label: 'ES - Espírito Santo' },
+  { value: 'GO', label: 'GO - Goiás' },
+  { value: 'MA', label: 'MA - Maranhão' },
+  { value: 'MT', label: 'MT - Mato Grosso' },
+  { value: 'MS', label: 'MS - Mato Grosso do Sul' },
+  { value: 'MG', label: 'MG - Minas Gerais' },
+  { value: 'PA', label: 'PA - Pará' },
+  { value: 'PB', label: 'PB - Paraíba' },
+  { value: 'PR', label: 'PR - Paraná' },
+  { value: 'PE', label: 'PE - Pernambuco' },
+  { value: 'PI', label: 'PI - Piauí' },
+  { value: 'RJ', label: 'RJ - Rio de Janeiro' },
+  { value: 'RN', label: 'RN - Rio Grande do Norte' },
+  { value: 'RS', label: 'RS - Rio Grande do Sul' },
+  { value: 'RO', label: 'RO - Rondônia' },
+  { value: 'RR', label: 'RR - Roraima' },
+  { value: 'SC', label: 'SC - Santa Catarina' },
+  { value: 'SP', label: 'SP - São Paulo' },
+  { value: 'SE', label: 'SE - Sergipe' },
+  { value: 'TO', label: 'TO - Tocantins' },
+];
+
 export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
   const { can } = useAuth();
   const { success, error: toastError } = useToast();
@@ -252,13 +282,45 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
 
   const handleOpenEdit = (filialItem: Filial) => {
     setSelectedFilial(filialItem);
+
+    const rawUf = filialItem.uf ? filialItem.uf.trim().toUpperCase() : 'PR';
+    const foundUf = UFS_BRASIL.find((u) => u.value === rawUf);
+    const currentUf = foundUf ? foundUf.value : 'PR';
+
+    let currentPredio = filialItem.predio || 'Próprio';
+    if (
+      currentPredio.toUpperCase().includes('ALUGADO') ||
+      currentPredio.includes('/') ||
+      (currentPredio.toUpperCase().includes('PRÓPRIO') && currentPredio.toUpperCase().includes('TERCEIRO'))
+    ) {
+      currentPredio = 'Próprio/Terceiro';
+    } else if (currentPredio.toUpperCase().includes('TERCEIRO')) {
+      currentPredio = 'Terceiro';
+    } else {
+      currentPredio = 'Próprio';
+    }
+
+    let currentTipo = filialItem.tipo || 'Loja';
+    if (currentTipo.toLowerCase().includes('ind')) {
+      currentTipo = 'Indústria';
+    } else if (
+      currentTipo.toLowerCase().includes('centr') ||
+      currentTipo.toLowerCase().includes('cd')
+    ) {
+      currentTipo = 'Centro de Distribuição';
+    } else if (currentTipo.toLowerCase().includes('posto')) {
+      currentTipo = 'Auto Posto Gazin';
+    } else {
+      currentTipo = 'Loja';
+    }
+
     setFormData({
       idfilial: filialItem.idfilial.toString(),
-      filial: filialItem.filial,
-      uf: filialItem.uf || 'PR',
-      predio: filialItem.predio,
-      metragem_quadrada: filialItem.metragem_quadrada.toString(),
-      tipo: filialItem.tipo,
+      filial: filialItem.filial || '',
+      uf: currentUf,
+      predio: currentPredio,
+      metragem_quadrada: filialItem.metragem_quadrada ? filialItem.metragem_quadrada.toString() : '0',
+      tipo: currentTipo,
     });
     setFormErrors({});
     setIsEditModalOpen(true);
@@ -683,14 +745,12 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    UF
+                    UF *
                   </label>
-                  <Input
-                    type="text"
-                    maxLength={2}
-                    placeholder="Ex: PR"
+                  <Select
                     value={formData.uf}
-                    onChange={(e) => setFormData({ ...formData, uf: e.target.value.toUpperCase() })}
+                    onChange={(e) => setFormData({ ...formData, uf: e.target.value })}
+                    options={UFS_BRASIL}
                   />
                 </div>
 
@@ -831,13 +891,12 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                UF
+                UF *
               </label>
-              <Input
-                type="text"
-                maxLength={2}
+              <Select
                 value={formData.uf}
-                onChange={(e) => setFormData({ ...formData, uf: e.target.value.toUpperCase() })}
+                onChange={(e) => setFormData({ ...formData, uf: e.target.value })}
+                options={UFS_BRASIL}
               />
             </div>
 
