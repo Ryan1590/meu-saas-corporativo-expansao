@@ -72,7 +72,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
 
           local-dir: ./front-end/dist/
-          server-dir: /adminexpansao.hrsistememas.com.br/front-end
+          server-dir: /adminexpansao.hrsistememas.com.br/front-end/
 
           exclude: |
             **/.git/**
