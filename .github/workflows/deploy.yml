@@ -3,20 +3,71 @@ name: Deploy completo (excavatrack)
 on:
   push:
     branches: [main]
+
   workflow_dispatch:
 
 jobs:
 
   # ============================================================
-  # BACK-END - LARAVEL
+  # BUILD FRONT-END + DEPLOY BACK-END
   # ============================================================
   deploy-backend:
     runs-on: ubuntu-latest
 
     steps:
+
+      # ==========================================================
+      # BAIXAR CÓDIGO
+      # ==========================================================
       - name: Baixar código
         uses: actions/checkout@v4
 
+
+      # ==========================================================
+      # CONFIGURAR NODE
+      # ==========================================================
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: front-end/package-lock.json
+
+
+      # ==========================================================
+      # INSTALAR DEPENDÊNCIAS DO FRONT-END
+      # ==========================================================
+      - name: Instalar dependências Front-end
+        working-directory: ./front-end
+        run: npm ci
+
+
+      # ==========================================================
+      # GERAR BUILD DO REACT / VITE
+      # ==========================================================
+      - name: Build Front-end
+        working-directory: ./front-end
+        run: npm run build
+
+
+      # ==========================================================
+      # COPIAR DIST PARA O PUBLIC DO LARAVEL
+      # ==========================================================
+      - name: Copiar Front-end para Laravel public
+        run: |
+          echo "Limpando assets antigos..."
+          rm -rf ./back-end/public/assets
+
+          echo "Copiando arquivos do dist..."
+          cp -R ./front-end/dist/. ./back-end/public/
+
+          echo "Conteúdo do public:"
+          find ./back-end/public -maxdepth 3 -type f
+
+
+      # ==========================================================
+      # DEPLOY BACK-END + FRONT-END
+      # ==========================================================
       - name: Deploy Backend Laravel
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -37,43 +88,3 @@ jobs:
             **/storage/framework/cache/**
             **/storage/framework/sessions/**
             **/storage/framework/views/**
-
-
-  # ============================================================
-  # FRONT-END - REACT / VITE
-  # ============================================================
-  deploy-frontend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Baixar código
-        uses: actions/checkout@v4
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: front-end/package-lock.json
-
-      - name: Instalar dependências
-        working-directory: ./front-end
-        run: npm ci
-
-      - name: Build Front-end
-        working-directory: ./front-end
-        run: npm run build
-
-      - name: Deploy Front-end
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-
-          local-dir: ./front-end/dist/
-          server-dir: /adminexpansao.hrsistememas.com.br/front-end/
-
-          exclude: |
-            **/.git/**
-            **/.github/**
