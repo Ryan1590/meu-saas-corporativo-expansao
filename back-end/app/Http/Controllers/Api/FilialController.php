@@ -84,7 +84,7 @@ class FilialController extends Controller
             ]);
         }
 
-        $perPage = (int) $request->query('perPage', 10);
+        $perPage = (int) $request->query('perPage', 5);
         $filiais = $query->paginate($perPage);
 
         return response()->json([

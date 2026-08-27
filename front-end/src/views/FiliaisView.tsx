@@ -80,7 +80,7 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
   const [sortColumn, setSortColumn] = useState('idfilial');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
