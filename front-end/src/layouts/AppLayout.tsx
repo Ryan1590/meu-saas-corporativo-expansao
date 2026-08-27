@@ -423,15 +423,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ currentPath, onNavigate, c
           <div className="flex gap-4 items-center">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              <span className="font-semibold text-gray-700 dark:text-slate-300">Systems Online</span>
+              <span className="font-semibold text-gray-700 dark:text-slate-300">Sistememas</span>
             </span>
             <span className="hidden sm:inline text-gray-400 dark:text-slate-500">|</span>
             <span className="hidden sm:inline">Server: Laravel 11 / Sanctum API (v2.4.1)</span>
           </div>
           <div className="flex gap-3 text-[10px] text-gray-400 dark:text-slate-500 font-mono">
-            <span>Memory: 42%</span>
-            <span>CPU: 12%</span>
-            <span className="hidden sm:inline">Latency: 24ms</span>
+            
+            <span className="hidden sm:inline">Admin Expansão</span>
           </div>
         </footer>
       </div>
