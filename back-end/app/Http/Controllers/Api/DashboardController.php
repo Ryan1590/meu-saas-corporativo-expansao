@@ -560,4 +560,60 @@ class DashboardController extends Controller
             'Content-Disposition' => 'attachment; filename="documentos_faltando_' . date('Ymd_His') . '.csv"',
         ]);
     }
+
+     
+    /**
+        * Export Status Vigência por Estado CSV
+    */
+    public function exportarStatusVigencia()
+    {
+        $dadosPorEstado = DB::table('filiais as f')
+            ->join('filial_documentos as fd', 'f.idfilial', '=', 'fd.idfilial')
+            ->whereNotNull('f.uf')
+            ->select('f.uf as estado')
+            ->selectRaw("
+                SUM(
+                    (CASE WHEN fd.alvara_corpo_bombeiro_vencimento >= CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.alvara_funcionamento_vencimento >= CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.alvara_ambiental_vencimento >= CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.certificado_brigada_vencimento >= CURDATE() THEN 1 ELSE 0 END)
+                ) as vigentes
+            ")
+            ->selectRaw("
+                SUM(
+                    (CASE WHEN fd.alvara_corpo_bombeiro_vencimento < CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.alvara_funcionamento_vencimento < CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.alvara_ambiental_vencimento < CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.certificado_brigada_vencimento < CURDATE() THEN 1 ELSE 0 END)
+                ) as vencidos
+            ")
+            ->groupBy('f.uf')
+            ->havingRaw('vigentes > 0 OR vencidos > 0')
+            ->orderBy('f.uf')
+            ->get();
+
+        $csvLines = [];
+        $csvLines[] = 'Estado;Total de Documentos;Documentos Vigentes;Documentos Vencidos';
+
+        foreach ($dadosPorEstado as $item) {
+            $totalDocs = (int)$item->vigentes + (int)$item->vencidos;
+
+            $csvLines[] = implode(';', [
+                $item->estado,
+                $totalDocs,
+                (int)$item->vigentes,
+                (int)$item->vencidos,
+            ]);
+        }
+
+        // "\xEF\xBB\xBF" adiciona o BOM UTF-8 para abrir com acentuação correta no Excel
+        $csvContent = "\xEF\xBB\xBF" . implode("\r\n", $csvLines);
+
+        return response($csvContent, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8; header=present',
+            'Content-Disposition' => 'attachment; filename="status_vigencia_estados_' . date('Ymd_His') . '.csv"',
+        ]);
+    }
+
+
 }

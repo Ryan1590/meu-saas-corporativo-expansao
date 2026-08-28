@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/dashboard/exportar/vencimentos', [DashboardController::class, 'exportarVencimentos']);
         Route::get('/dashboard/exportar/faltando', [DashboardController::class, 'exportarFaltando']);
         Route::get('/birthdays', [BirthdayController::class, 'index']);
+        Route::get('/dashboard/exportar/status-vigencia', [DashboardController::class, 'exportarStatusVigencia']);
 
         // Gestão de Usuários
         Route::apiResource('users', UserController::class);

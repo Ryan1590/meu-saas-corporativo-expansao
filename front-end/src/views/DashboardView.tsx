@@ -155,6 +155,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
     window.open(`/api/v1/dashboard/exportar/vencimentos?token=${encodeURIComponent(token)}`, '_blank');
   };
 
+  const handleExportStatusVigencia = () => {
+    const token = localStorage.getItem('auth_token') || '';
+    window.open(`/api/v1/dashboard/exportar/status-vigencia?token=${encodeURIComponent(token)}`, '_blank');
+  };
+
   const handleExportFaltando = () => {
     const token = localStorage.getItem('auth_token') || '';
     window.open(`/api/v1/dashboard/exportar/faltando?token=${encodeURIComponent(token)}`, '_blank');
@@ -374,6 +379,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
             <h3 className="font-bold text-slate-800 dark:text-white text-xs uppercase tracking-wider">
               Status de validade de documentos por Estado (UF)
             </h3>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="neutral" size="sm">
+              {data.porEstado?.length || 0} registros
+            </Badge>
+            <Button variant="outline" size="sm" onClick={handleExportStatusVigencia}>
+              <FileSpreadsheet className="w-3.5 h-3.5 me-1 text-emerald-500" />
+            </Button>
           </div>
         </div>
 
