@@ -63,12 +63,20 @@ const UFS_BRASIL = [
   { value: 'TO', label: 'TO - Tocantins' },
 ];
 
+
+const getInitialPage = (): number => {
+  const params = new URLSearchParams(window.location.search);
+  const pageParam = Number(params.get('page'));
+  return pageParam && !isNaN(pageParam) && pageParam > 0 ? pageParam : 1;
+};
+
 export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
   const { can } = useAuth();
   const { success, error: toastError } = useToast();
 
   const [filiais, setFiliais] = useState<Filial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
 
   // Filters state
   const [filtroIdFilial, setFiltroIdFilial] = useState('');
@@ -79,10 +87,18 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
   // Sorting & Pagination
   const [sortColumn, setSortColumn] = useState('idfilial');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(getInitialPage());
   const [perPage, setPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+
+  // Sincroniza a página caso a URL mude com o componente já montado
+  useEffect(() => {
+    const pageFromUrl = getInitialPage();
+    if (pageFromUrl !== currentPage) {
+      setCurrentPage(pageFromUrl);
+    }
+  }, []);
 
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -100,6 +116,8 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
     metragem_quadrada: '',
     tipo: '',
   });
+
+
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -187,6 +205,12 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
       setSortDirection('asc');
     }
   };
+
+
+
+
+
+
 
   const handleCreateFilial = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -549,6 +573,12 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                     {getSortIcon('filial')}
                   </div>
                 </th>
+                <th className="py-3 px-4 text-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"onClick={() => handleSort('uf')}>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span>UF</span>
+                    {getSortIcon('uf')}
+                  </div>
+                </th>
                 <th
                   className="py-3 px-4 text-center cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors select-none"
                   onClick={() => handleSort('predio')}
@@ -597,15 +627,15 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                 </tr>
               ) : (
                 filiais.map((item) => (
-                  <tr
-                    key={item.idfilial}
-                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
-                  >
+                  <tr key={item.idfilial} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
                     <td className="py-3 px-4 text-center font-bold text-slate-800 dark:text-slate-200">
                       {item.idfilial}
                     </td>
                     <td className="py-3 px-4 font-medium text-slate-900 dark:text-white">
                       {item.filial}
+                    </td>
+                    <td className="py-3 px-4 text-center font-mono text-slate-700 dark:text-slate-300">
+                      {item.uf}
                     </td>
                     <td className="py-3 px-4 text-center">
                       <Badge
@@ -631,13 +661,13 @@ export const FiliaisView: React.FC<FiliaisViewProps> = ({ onNavigate }) => {
                     </td>
                     <td className="py-3 px-4 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => onNavigate(`/filiais/documentos?idfilial=${item.idfilial}`)}
-                          className="p-1.5 rounded-lg text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/50 transition-colors"
-                          title="Gerenciar Documentos"
-                        >
-                          <FolderCheck className="w-4 h-4" />
-                        </button>
+                     <button
+                        onClick={() => onNavigate(`/filiais/documentos?idfilial=${item.idfilial}&page=${currentPage}`)}
+                        className="p-1.5 rounded-lg text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/50 transition-colors"
+                        title="Gerenciar Documentos"
+                      >
+                        <FolderCheck className="w-4 h-4" />
+                      </button>
                         <button
                           onClick={() => handleOpenEdit(item)}
                           className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"

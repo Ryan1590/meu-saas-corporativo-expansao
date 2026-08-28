@@ -136,6 +136,10 @@ export const FilialDocumentosView: React.FC<FilialDocumentosViewProps> = ({ onNa
     }
   };
 
+
+const urlParams = new URLSearchParams(window.location.search); // ler a url para pegar o parametro page, caso exista, para voltar para a pagina correta
+const returnPage = urlParams.get('page') || '1'; // default to page 1 if not present
+
   const handleFileChange = (arquivoCampo: string, file: File | null) => {
     setFiles((prev) => ({ ...prev, [arquivoCampo]: file }));
   };
@@ -254,7 +258,7 @@ export const FilialDocumentosView: React.FC<FilialDocumentosViewProps> = ({ onNa
             <Download className="w-4 h-4 me-1.5 text-emerald-500" /> Exportar Todos (ZIP)
           </a>
 
-          <Button variant="outline" onClick={() => onNavigate('/filiais')}>
+          <Button variant="outline" onClick={() => onNavigate(`/filiais?page=${returnPage}`)}>
             <span className="inline-flex items-center gap-1.5">
               <ArrowLeft className="w-4 h-4" />
               Voltar
