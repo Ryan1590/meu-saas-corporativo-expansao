@@ -10,6 +10,7 @@ use App\Models\FilialDocumento;
 use App\Models\FilialDocumentoObrigatorio;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -261,6 +262,7 @@ class DashboardController extends Controller
 
                 if ($venc) {
                     if ($venc->lt($hoje)) {
+                        // Documento VENCIDO
                         $statusCount['vencido']++;
                         $porDocumento[$label]++;
                         $fHasVencido = true;
@@ -279,35 +281,41 @@ class DashboardController extends Controller
                             'dias' => $dias,
                             'status' => 'Vencido',
                         ];
-                    } elseif ($venc->lte($em30dias)) {
-                        $statusCount['vence']++;
-                        $fHasVencendo = true;
-                        $dias = (int) $hoje->diffInDays($venc);
-
-                        $proximosVencimentosList[] = [
-                            'idfilial' => $f->idfilial,
-                            'filial' => $this->cleanText($f->filial),
-                            'uf' => $f->uf ?? 'PR',
-                            'documento' => $label,
-                            'vencimento' => $venc->format('Y-m-d'),
-                            'dias' => $dias,
-                            'status' => 'Vence em breve',
-                        ];
                     } else {
+                        // DOCUMENTO VIGENTE (OK) - Conta SEMPRE que a data for hoje ou futura
                         $statusCount['ok']++;
-                    }
 
-                    if ($field === 'alvara_corpo_bombeiro' && $venc->gte($hoje) && !empty($path)) {
-                        $bombeirosOkCount++;
-                    }
-                    if ($field === 'alvara_funcionamento' && $venc->gte($hoje) && !empty($path)) {
-                        $funcionamentoOkCount++;
+                        // Se ALÉM de vigente ele vence nos próximos 30 dias, conta no alerta também:
+                        if ($venc->lte($em30dias)) {
+                            $statusCount['vence']++;
+                            $fHasVencendo = true;
+                            $dias = (int) $hoje->diffInDays($venc);
+
+                            $proximosVencimentosList[] = [
+                                'idfilial' => $f->idfilial,
+                                'filial' => $this->cleanText($f->filial),
+                                'uf' => $f->uf ?? 'PR',
+                                'documento' => $label,
+                                'vencimento' => $venc->format('Y-m-d'),
+                                'dias' => $dias,
+                                'status' => 'Vence em breve',
+                            ];
+                        }
+
+                        if ($field === 'alvara_corpo_bombeiro' && !empty($path)) {
+                            $bombeirosOkCount++;
+                        }
+                        if ($field === 'alvara_funcionamento' && !empty($path)) {
+                            $funcionamentoOkCount++;
+                        }
                     }
                 } else {
+                    // Documento sem data de vencimento preenchida, mas com anexo
                     if (!empty($path)) {
                         $statusCount['ok']++;
                     }
                 }
+
             }
 
             if ($fHasVencido) {
@@ -357,6 +365,35 @@ class DashboardController extends Controller
             ? round(($funcionamentoOkCount / $totalFiliais) * 100, 1)
             : 0;
 
+
+        $dadosPorEstado = DB::table('filiais as f')
+            ->join('filial_documentos as fd', 'f.idfilial', '=', 'fd.idfilial')
+            ->whereNotNull('f.uf')
+            ->select('f.uf as estado')
+            ->selectRaw("
+                SUM(
+                    (CASE WHEN fd.alvara_corpo_bombeiro_vencimento >= CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.alvara_funcionamento_vencimento >= CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.alvara_ambiental_vencimento >= CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.certificado_brigada_vencimento >= CURDATE() THEN 1 ELSE 0 END)
+                ) as vigentes
+            ")
+            ->selectRaw("
+                SUM(
+                    (CASE WHEN fd.alvara_corpo_bombeiro_vencimento < CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.alvara_funcionamento_vencimento < CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.alvara_ambiental_vencimento < CURDATE() THEN 1 ELSE 0 END) +
+                    (CASE WHEN fd.certificado_brigada_vencimento < CURDATE() THEN 1 ELSE 0 END)
+                ) as vencidos
+            ")
+            ->groupBy('f.uf')
+            ->havingRaw('vigentes > 0 OR vencidos > 0') // <-- FILTRA FORA QUEM NÃO TEM NENHUM
+            ->orderBy('f.uf')
+            ->get();
+
+        
+    
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -404,6 +441,7 @@ class DashboardController extends Controller
                         'total' => count($faltandoList),
                     ],
                 ],
+                'porEstado' => $dadosPorEstado,
             ],
         ]);
     }

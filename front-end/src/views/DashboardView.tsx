@@ -190,7 +190,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
 
   // Chart 1: Status Donut Chart Data
   const statusChartData = [
-    { name: 'OK (em dia)', value: data.status?.ok || 0, color: '#10b981' },
+    { name: 'OK (em dia) (dentro do prazo de validade)', value: data.status?.ok || 0, color: '#10b981' },
     { name: 'Vence em breve (30d)', value: data.status?.vence || 0, color: '#f59e0b' },
     { name: 'Vencido (crítico)', value: data.status?.vencido || 0, color: '#ef4444' },
   ];
@@ -365,7 +365,65 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* TABELA 1: PRÓXIMOS VENCIMENTOS (Até 30 dias) */}
+
+       {/* TABELA: DOCUMENTOS POR ESTADO (UF) */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Building className="w-4 h-4 text-indigo-500" />
+            <h3 className="font-bold text-slate-800 dark:text-white text-xs uppercase tracking-wider">
+              Status de validade de documentos por Estado (UF)
+            </h3>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold uppercase tracking-wider">
+                <th className="py-3 px-4 text-center w-24">Estado</th>
+                <th className="py-3 px-4 text-center">Documentos Vigentes</th>
+                <th className="py-3 px-4 text-center">Documentos Vencidos</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+              {!data?.porEstado || data.porEstado.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="py-8 text-center text-slate-400">
+                    Nenhum registro encontrado.
+                  </td>
+                </tr>
+              ) : (
+                data.porEstado.map((item: any, idx: number) => (
+                  <tr key={idx} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
+                    <td className="py-3 px-4 text-center">
+                      <Badge variant="indigo" size="sm">
+                        {item.estado}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                        {Number(item.vigentes || 0).toLocaleString('pt-BR')}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      {Number(item.vencidos || 0) > 0 ? (
+                        <Badge variant="danger" size="sm">
+                          {Number(item.vencidos).toLocaleString('pt-BR')}
+                        </Badge>
+                      ) : (
+                        <span className="text-slate-400">0</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    {/* TABELA 1: PRÓXIMOS VENCIMENTOS (Até 30 dias) */}
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2">

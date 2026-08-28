@@ -255,7 +255,10 @@ export const FilialDocumentosView: React.FC<FilialDocumentosViewProps> = ({ onNa
           </a>
 
           <Button variant="outline" onClick={() => onNavigate('/filiais')}>
-            <ArrowLeft className="w-4 h-4 me-1.5" /> Voltar
+            <span className="inline-flex items-center gap-1.5">
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </span>
           </Button>
         </div>
       </div>
@@ -418,7 +421,10 @@ export const FilialDocumentosView: React.FC<FilialDocumentosViewProps> = ({ onNa
         {/* Save Button */}
         <div className="flex justify-end pt-4">
           <Button variant="primary" type="submit" isLoading={isSubmitting} size="lg">
-            <Save className="w-4 h-4 me-2" /> Salvar Documentos
+            <span className="inline-flex items-center gap-2">
+              <Save className="w-4 h-4" />
+              Salvar
+            </span>
           </Button>
         </div>
       </form>
