@@ -58,7 +58,7 @@ class User extends Authenticatable
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'role_user')->withTimestamps();
+       return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id')->withTimestamps();
     }
 
     public function activityLogs(): HasMany
@@ -71,7 +71,6 @@ class User extends Authenticatable
         if (is_string($roles)) {
             return $this->roles->contains('name', $roles);
         }
-
         return $this->roles->whereIn('name', $roles)->isNotEmpty();
     }
 
@@ -81,7 +80,6 @@ class User extends Authenticatable
         if ($this->hasRole('admin')) {
             return true;
         }
-
         return $this->roles->flatMap->permissions->contains('name', $permission);
     }
 
@@ -90,10 +88,8 @@ class User extends Authenticatable
         if ($this->hasRole('admin')) {
             return Permission::pluck('name')->toArray();
         }
-
         return $this->roles->flatMap->permissions->pluck('name')->unique()->values()->toArray();
     }
-
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));

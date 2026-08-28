@@ -3,22 +3,12 @@ import {
   Users,
   Search,
   Plus,
-  Filter,
   Edit2,
   Trash2,
   Eye,
-  Shield,
   KeyRound,
-  CheckCircle,
-  XCircle,
   Download,
   MoreVertical,
-  RotateCcw,
-  Mail,
-  Calendar,
-  Lock,
-  UserCheck,
-  AlertCircle,
 } from 'lucide-react';
 import { User, Role, UserStatus } from '../types';
 import { Table, Column, Pagination } from '../components/design-system/Table';
@@ -70,6 +60,12 @@ export const UsersView: React.FC = () => {
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Verifica se o usuário autenticado possui perfil de admin (usando currentUser)
+  const isLoggedAdmin =
+    currentUser?.rolesDetails?.some((r) => r.name === 'admin') ||
+    currentUser?.roles?.some((r: any) => (typeof r === 'string' ? r === 'admin' : r.name === 'admin')) ||
+    false;
 
   // Load available roles
   useEffect(() => {
@@ -135,13 +131,14 @@ export const UsersView: React.FC = () => {
 
   // Open Add Modal
   const handleOpenAdd = () => {
+    const defaultRole = roles.find((r) => r.name !== 'admin') || roles[0];
     setFormData({
       name: '',
       email: '',
       data_nascimento: '',
       avatar: '',
       status: 'active',
-      roles: roles.length > 0 ? [roles[0].id] : ['role-operator'],
+      roles: defaultRole ? [defaultRole.id] : [],
     });
     setFormErrors({});
     setIsAddModalOpen(true);
@@ -312,11 +309,12 @@ export const UsersView: React.FC = () => {
   };
 
   const handleExportXLS = () => {
-    const escapeHtml = (value: unknown) => String(value ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    const escapeHtml = (value: unknown) =>
+      String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
     const headers = ['ID', 'Nome', 'Email', 'Data de Nascimento', 'Status', 'Perfis', 'Criado em'];
     const rows = users.map((u) => [
       u.id,
@@ -564,7 +562,9 @@ export const UsersView: React.FC = () => {
             }}
             options={[
               { value: 'all', label: 'Todos os Perfis' },
-              ...roles.map((r) => ({ value: r.name, label: r.label })),
+              ...roles
+                .filter((r) => isLoggedAdmin || (r.name !== 'admin' && r.label !== 'Desenvolvedor'))
+                .map((r) => ({ value: r.name, label: r.label })),
             ]}
           />
         </div>
@@ -658,23 +658,25 @@ export const UsersView: React.FC = () => {
               Perfis de Acesso (Roles) <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-2 gap-2 border border-slate-200 dark:border-slate-800 p-3 rounded-lg bg-slate-50/50 dark:bg-slate-900/50">
-              {roles.map((role) => (
-                <Checkbox
-                  key={role.id}
-                  label={role.label}
-                  description={`${role.permissions.length} permissões`}
-                  checked={formData.roles.includes(role.id) || formData.roles.includes(role.name)}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setFormData((prev) => ({
-                      ...prev,
-                      roles: checked
-                        ? [...prev.roles, role.id]
-                        : prev.roles.filter((r) => r !== role.id && r !== role.name),
-                    }));
-                  }}
-                />
-              ))}
+              {roles
+                .filter((role) => isLoggedAdmin || (role.name !== 'admin' && role.label !== 'Desenvolvedor'))
+                .map((role) => (
+                  <Checkbox
+                    key={role.id}
+                    label={role.label}
+                    description={`${role.permissions?.length || 0} permissões`}
+                    checked={formData.roles.includes(role.id) || formData.roles.includes(role.name)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setFormData((prev) => ({
+                        ...prev,
+                        roles: checked
+                          ? [...prev.roles, role.id]
+                          : prev.roles.filter((r) => r !== role.id && r !== role.name),
+                      }));
+                    }}
+                  />
+                ))}
             </div>
             {formErrors.roles && <p className="text-xs text-rose-500">{formErrors.roles}</p>}
           </div>
@@ -748,23 +750,25 @@ export const UsersView: React.FC = () => {
               Perfis de Acesso (Roles)
             </label>
             <div className="grid grid-cols-2 gap-2 border border-slate-200 dark:border-slate-800 p-3 rounded-lg bg-slate-50/50 dark:bg-slate-900/50">
-              {roles.map((role) => (
-                <Checkbox
-                  key={role.id}
-                  label={role.label}
-                  description={`${role.permissions.length} permissões`}
-                  checked={formData.roles.includes(role.id) || formData.roles.includes(role.name)}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setFormData((prev) => ({
-                      ...prev,
-                      roles: checked
-                        ? [...prev.roles, role.id]
-                        : prev.roles.filter((r) => r !== role.id && r !== role.name),
-                    }));
-                  }}
-                />
-              ))}
+              {roles
+                .filter((role) => isLoggedAdmin || (role.name !== 'admin' && role.label !== 'Desenvolvedor'))
+                .map((role) => (
+                  <Checkbox
+                    key={role.id}
+                    label={role.label}
+                    description={`${role.permissions?.length || 0} permissões`}
+                    checked={formData.roles.includes(role.id) || formData.roles.includes(role.name)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setFormData((prev) => ({
+                        ...prev,
+                        roles: checked
+                          ? [...prev.roles, role.id]
+                          : prev.roles.filter((r) => r !== role.id && r !== role.name),
+                      }));
+                    }}
+                  />
+                ))}
             </div>
           </div>
 

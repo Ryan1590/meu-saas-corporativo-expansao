@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\ActivityLog;
 use App\Models\User;
+use App\Models\Role; // <-- Importação do Model Role
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -41,13 +43,20 @@ class UserService
         $resolvedSortColumn = self::SORTABLE_COLUMNS[$sortColumn] ?? 'created_at';
         $resolvedSortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
 
+        $currentUser = Auth::user();
+        $isLoggedAdmin = $currentUser instanceof User && $currentUser->hasRole('admin');
+
         return User::query()
             ->with(['roles.permissions'])
-            ->where('email', '!=', 'admin@empresa.com')
+            ->when(!$isLoggedAdmin, function ($query) {
+                $query->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'admin');
+                });
+            })
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 });
             })
             ->when($status && $status !== 'all', fn ($q) => $q->where('status', $status))
@@ -71,7 +80,17 @@ class UserService
             ]);
 
             if (!empty($data['roles'])) {
-                $user->roles()->sync($data['roles']);
+                // 1. AQUI: Filtra a role admin se quem está cadastrando não for admin
+                $currentUser = Auth::user();
+                $isLoggedAdmin = $currentUser instanceof User && $currentUser->hasRole('admin');
+                $rolesToSync = $data['roles'];
+
+                if (!$isLoggedAdmin) {
+                    $adminRoleId = Role::where('name', 'admin')->value('id');
+                    $rolesToSync = array_filter($rolesToSync, fn ($id) => $id != $adminRoleId && $id !== 'admin');
+                }
+
+                $user->roles()->sync($rolesToSync);
             }
 
             ActivityLog::create([
@@ -87,7 +106,6 @@ class UserService
             if (!$this->sendPasswordResetLink($user)) {
                 throw new RuntimeException('Não foi possível enviar o convite de definição de senha.');
             }
-
             return $user->load('roles.permissions');
         });
     }
@@ -115,7 +133,17 @@ class UserService
             $user->update($updateFields);
 
             if (isset($data['roles'])) {
-                $user->roles()->sync($data['roles']);
+                // 2. AQUI: Filtra a role admin se quem está editando não for admin
+                $currentUser = Auth::user();
+                $isLoggedAdmin = $currentUser instanceof User && $currentUser->hasRole('admin');
+                $rolesToSync = $data['roles'];
+
+                if (!$isLoggedAdmin) {
+                    $adminRoleId = Role::where('name', 'admin')->value('id');
+                    $rolesToSync = array_filter($rolesToSync, fn ($id) => $id != $adminRoleId && $id !== 'admin');
+                }
+
+                $user->roles()->sync($rolesToSync);
             }
 
             ActivityLog::create([
